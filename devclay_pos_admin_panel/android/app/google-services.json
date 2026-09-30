@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "570598256259",
+    "project_id": "devclaypos",
+    "storage_bucket": "devclaypos.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:570598256259:android:c905682139bb945a1475b6",
+        "android_client_info": {
+          "package_name": "com.example.devclay_pos_admin_panel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMFWKKbyszmFWTh3S-EH6DC9Gl7Sgu5IY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

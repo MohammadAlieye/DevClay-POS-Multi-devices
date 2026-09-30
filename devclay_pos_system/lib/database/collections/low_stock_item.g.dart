@@ -1,0 +1,852 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'low_stock_item.dart';
+
+// **************************************************************************
+// IsarCollectionGenerator
+// **************************************************************************
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
+
+extension GetLowStockItemCollection on Isar {
+  IsarCollection<LowStockItem> get lowStockItems => this.collection();
+}
+
+const LowStockItemSchema = CollectionSchema(
+  name: r'LowStockItem',
+  id: 6845256593038566485,
+  properties: {
+    r'name': PropertySchema(id: 0, name: r'name', type: IsarType.string),
+    r'quantity': PropertySchema(id: 1, name: r'quantity', type: IsarType.long),
+    r'reorderLevel': PropertySchema(
+      id: 2,
+      name: r'reorderLevel',
+      type: IsarType.long,
+    ),
+    r'sku': PropertySchema(id: 3, name: r'sku', type: IsarType.string),
+  },
+
+  estimateSize: _lowStockItemEstimateSize,
+  serialize: _lowStockItemSerialize,
+  deserialize: _lowStockItemDeserialize,
+  deserializeProp: _lowStockItemDeserializeProp,
+  idName: r'id',
+  indexes: {},
+  links: {},
+  embeddedSchemas: {},
+
+  getId: _lowStockItemGetId,
+  getLinks: _lowStockItemGetLinks,
+  attach: _lowStockItemAttach,
+  version: '3.3.2',
+);
+
+int _lowStockItemEstimateSize(
+  LowStockItem object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  bytesCount += 3 + object.name.length * 3;
+  bytesCount += 3 + object.sku.length * 3;
+  return bytesCount;
+}
+
+void _lowStockItemSerialize(
+  LowStockItem object,
+  IsarWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeString(offsets[0], object.name);
+  writer.writeLong(offsets[1], object.quantity);
+  writer.writeLong(offsets[2], object.reorderLevel);
+  writer.writeString(offsets[3], object.sku);
+}
+
+LowStockItem _lowStockItemDeserialize(
+  Id id,
+  IsarReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  final object = LowStockItem();
+  object.id = id;
+  object.name = reader.readString(offsets[0]);
+  object.quantity = reader.readLong(offsets[1]);
+  object.reorderLevel = reader.readLong(offsets[2]);
+  object.sku = reader.readString(offsets[3]);
+  return object;
+}
+
+P _lowStockItemDeserializeProp<P>(
+  IsarReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
+    case 0:
+      return (reader.readString(offset)) as P;
+    case 1:
+      return (reader.readLong(offset)) as P;
+    case 2:
+      return (reader.readLong(offset)) as P;
+    case 3:
+      return (reader.readString(offset)) as P;
+    default:
+      throw IsarError('Unknown property with id $propertyId');
+  }
+}
+
+Id _lowStockItemGetId(LowStockItem object) {
+  return object.id;
+}
+
+List<IsarLinkBase<dynamic>> _lowStockItemGetLinks(LowStockItem object) {
+  return [];
+}
+
+void _lowStockItemAttach(
+  IsarCollection<dynamic> col,
+  Id id,
+  LowStockItem object,
+) {
+  object.id = id;
+}
+
+extension LowStockItemQueryWhereSort
+    on QueryBuilder<LowStockItem, LowStockItem, QWhere> {
+  QueryBuilder<LowStockItem, LowStockItem, QAfterWhere> anyId() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(const IdWhereClause.any());
+    });
+  }
+}
+
+extension LowStockItemQueryWhere
+    on QueryBuilder<LowStockItem, LowStockItem, QWhereClause> {
+  QueryBuilder<LowStockItem, LowStockItem, QAfterWhereClause> idEqualTo(Id id) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterWhereClause> idNotEqualTo(
+    Id id,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      if (query.whereSort == Sort.asc) {
+        return query
+            .addWhereClause(
+              IdWhereClause.lessThan(upper: id, includeUpper: false),
+            )
+            .addWhereClause(
+              IdWhereClause.greaterThan(lower: id, includeLower: false),
+            );
+      } else {
+        return query
+            .addWhereClause(
+              IdWhereClause.greaterThan(lower: id, includeLower: false),
+            )
+            .addWhereClause(
+              IdWhereClause.lessThan(upper: id, includeUpper: false),
+            );
+      }
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterWhereClause> idGreaterThan(
+    Id id, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.greaterThan(lower: id, includeLower: include),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterWhereClause> idLessThan(
+    Id id, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.lessThan(upper: id, includeUpper: include),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterWhereClause> idBetween(
+    Id lowerId,
+    Id upperId, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addWhereClause(
+        IdWhereClause.between(
+          lower: lowerId,
+          includeLower: includeLower,
+          upper: upperId,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+}
+
+extension LowStockItemQueryFilter
+    on QueryBuilder<LowStockItem, LowStockItem, QFilterCondition> {
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> idEqualTo(
+    Id value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'id', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> idGreaterThan(
+    Id value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> idLessThan(
+    Id value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> idBetween(
+    Id lower,
+    Id upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'id',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> nameEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'name',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  nameGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'name',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> nameLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'name',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> nameBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'name',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  nameStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'name',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> nameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'name',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> nameContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'name',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> nameMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'name',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  nameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'name', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  nameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'name', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  quantityEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'quantity', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  quantityGreaterThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'quantity',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  quantityLessThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'quantity',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  quantityBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'quantity',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  reorderLevelEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'reorderLevel', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  reorderLevelGreaterThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'reorderLevel',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  reorderLevelLessThan(int value, {bool include = false}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'reorderLevel',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  reorderLevelBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'reorderLevel',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'sku',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  skuGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'sku',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'sku',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'sku',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'sku',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'sku',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'sku',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'sku',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition> skuIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'sku', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterFilterCondition>
+  skuIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'sku', value: ''),
+      );
+    });
+  }
+}
+
+extension LowStockItemQueryObject
+    on QueryBuilder<LowStockItem, LowStockItem, QFilterCondition> {}
+
+extension LowStockItemQueryLinks
+    on QueryBuilder<LowStockItem, LowStockItem, QFilterCondition> {}
+
+extension LowStockItemQuerySortBy
+    on QueryBuilder<LowStockItem, LowStockItem, QSortBy> {
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortByQuantity() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'quantity', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortByQuantityDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'quantity', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortByReorderLevel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reorderLevel', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy>
+  sortByReorderLevelDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reorderLevel', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortBySku() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sku', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> sortBySkuDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sku', Sort.desc);
+    });
+  }
+}
+
+extension LowStockItemQuerySortThenBy
+    on QueryBuilder<LowStockItem, LowStockItem, QSortThenBy> {
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenById() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenByIdDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'id', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenByName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenByNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenByQuantity() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'quantity', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenByQuantityDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'quantity', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenByReorderLevel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reorderLevel', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy>
+  thenByReorderLevelDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reorderLevel', Sort.desc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenBySku() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sku', Sort.asc);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QAfterSortBy> thenBySkuDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'sku', Sort.desc);
+    });
+  }
+}
+
+extension LowStockItemQueryWhereDistinct
+    on QueryBuilder<LowStockItem, LowStockItem, QDistinct> {
+  QueryBuilder<LowStockItem, LowStockItem, QDistinct> distinctByName({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QDistinct> distinctByQuantity() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'quantity');
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QDistinct> distinctByReorderLevel() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reorderLevel');
+    });
+  }
+
+  QueryBuilder<LowStockItem, LowStockItem, QDistinct> distinctBySku({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'sku', caseSensitive: caseSensitive);
+    });
+  }
+}
+
+extension LowStockItemQueryProperty
+    on QueryBuilder<LowStockItem, LowStockItem, QQueryProperty> {
+  QueryBuilder<LowStockItem, int, QQueryOperations> idProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<LowStockItem, String, QQueryOperations> nameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<LowStockItem, int, QQueryOperations> quantityProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'quantity');
+    });
+  }
+
+  QueryBuilder<LowStockItem, int, QQueryOperations> reorderLevelProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reorderLevel');
+    });
+  }
+
+  QueryBuilder<LowStockItem, String, QQueryOperations> skuProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'sku');
+    });
+  }
+}

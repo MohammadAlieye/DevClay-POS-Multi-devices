@@ -1,0 +1,128 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Must match SuperAdminConfig.email in the Flutter apps.
+    function isSuperAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'superadmin@devclaypos.internal';
+    }
+
+    function isAdmin() {
+      return request.auth != null && (
+        isSuperAdmin()
+        || exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function adminDoc() {
+      return get(/databases/$(database)/documents/admins/$(request.auth.uid)).data;
+    }
+
+    function isActiveAdmin() {
+      return isSuperAdmin()
+        || (isAdmin() && adminDoc().locked != true);
+    }
+
+    // ----- settings (public read for trial days / maintenance) -----
+    match /settings/{docId} {
+      allow get: if true;
+      allow list: if isActiveAdmin();
+      allow write: if isActiveAdmin();
+    }
+
+    // ----- admins (Super Admin never stored here) -----
+    match /admins/{uid} {
+      allow get: if isActiveAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow list: if isActiveAdmin();
+      allow create: if isSuperAdmin()
+        || (isActiveAdmin() && request.resource.data.role != 'superAdmin');
+      allow update: if isSuperAdmin()
+        || (isActiveAdmin() && resource.data.role != 'superAdmin');
+      allow delete: if isSuperAdmin()
+        || (isActiveAdmin() && resource.data.role != 'superAdmin'
+            && uid != request.auth.uid);
+    }
+
+    // ----- customers (license customers / businesses) -----
+    match /customers/{customerId} {
+      allow read, write: if isActiveAdmin();
+    }
+
+    // ----- licenses -----
+    // Document ID = normalized license key so POS can get() without listing.
+    match /licenses/{licenseId} {
+      allow get: if true;
+      allow list: if isActiveAdmin();
+      allow create, delete: if isActiveAdmin();
+
+      // Admin full update OR POS machine binding activation.
+      allow update: if isActiveAdmin() || isValidPosActivation() || isValidPosStatusSync();
+
+      function isValidPosActivation() {
+        let data = request.resource.data;
+        let prior = resource.data;
+        return prior.machineId == null
+          && data.machineId is string
+          && data.machineId.size() > 0
+          && data.licenseKey == prior.licenseKey
+          && data.licenseKeyHash == prior.licenseKeyHash
+          && data.status in ['Active', 'Trial']
+          && prior.status in ['Active', 'Trial']
+          && data.businessName == prior.businessName
+          && data.ownerName == prior.ownerName
+          && data.phoneNumber == prior.phoneNumber
+          && data.email == prior.email
+          && data.licenseType == prior.licenseType;
+      }
+
+      // Allow POS to refresh updatedAt / status when already bound to same machine.
+      function isValidPosStatusSync() {
+        let data = request.resource.data;
+        let prior = resource.data;
+        return prior.machineId != null
+          && data.machineId == prior.machineId
+          && data.licenseKey == prior.licenseKey
+          && data.licenseKeyHash == prior.licenseKeyHash
+          && data.businessName == prior.businessName;
+      }
+
+      match /activationHistory/{historyId} {
+        allow read: if isActiveAdmin();
+        allow create: if true; // POS records activation events
+        allow update, delete: if isActiveAdmin();
+      }
+    }
+
+    // ----- device trials (optional online sync) -----
+    match /deviceTrials/{machineId} {
+      allow get: if true;
+      allow list: if isActiveAdmin();
+      allow create: if request.resource.data.machineId == machineId;
+      allow update: if resource.data.machineId == machineId
+        && request.resource.data.machineId == machineId
+        && request.resource.data.startedAt == resource.data.startedAt;
+      allow delete: if isActiveAdmin();
+    }
+
+    // ----- license requests (POS renew / support requests) -----
+    // POS apps are unauthenticated; they may only create Pending requests.
+    match /licenseRequests/{requestId} {
+      allow create: if request.resource.data.keys().hasAll([
+          'machineId', 'status', 'type', 'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.machineId is string
+        && request.resource.data.machineId.size() > 0
+        && request.resource.data.status == 'Pending'
+        && request.resource.data.type is string;
+      allow get, list, update, delete: if isActiveAdmin();
+    }
+
+    // ----- audit logs -----
+    match /auditLogs/{logId} {
+      allow read: if isActiveAdmin();
+      allow create: if isActiveAdmin()
+        || (request.resource.data.action is string);
+      allow update, delete: if isSuperAdmin();
+    }
+  }
+}
