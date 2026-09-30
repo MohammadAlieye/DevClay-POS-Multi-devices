@@ -5,6 +5,7 @@ import 'package:isar_community/isar.dart';
 import '../../database/collections/app_setting.dart';
 import '../../database/collections/label_template.dart';
 import '../../database/isar_service.dart';
+import '../../database/restaurant_floor_seed.dart';
 import '../../modules/labels/domain/entities/label_entities.dart';
 import '../../widgets/field_limits.dart';
 import '../lan_api/client/lan_api_client.dart';
@@ -20,14 +21,17 @@ class StoreProfileService extends ChangeNotifier {
   final IsarService _isarService;
   bool _configured = false;
   bool _loaded = false;
+  StoreProfileId _profileId = StoreProfileId.generalRetail;
 
   Isar get _isar => _isarService.instance;
 
   bool get isConfiguredCached => _configured;
+  StoreProfileId get profileIdCached => _profileId;
 
   Future<void> load() async {
     final record = await _record();
     _configured = record.storeProfileConfigured;
+    _profileId = StoreProfileId.fromStorage(record.storeProfile);
     _loaded = true;
     notifyListeners();
   }
@@ -127,6 +131,7 @@ class StoreProfileService extends ChangeNotifier {
       await _isar.appSettings.put(record);
     });
     _configured = profile.storeProfileConfigured;
+    _profileId = StoreProfileId.fromStorage(profile.storeProfile);
     _loaded = true;
     notifyListeners();
   }
@@ -155,7 +160,8 @@ class StoreProfileService extends ChangeNotifier {
         ..enableProductVariants = def.flags.enableProductVariants
         ..enableVariableMeasureSales = def.flags.enableVariableMeasureSales
         ..preferVolumeUnits = def.flags.preferVolumeUnits
-        ..preferredLabelStoreType = def.labelStoreType.name;
+        ..preferredLabelStoreType = def.labelStoreType.name
+        ..enableRestaurantFloor = id == StoreProfileId.restaurant;
 
       final categoriesEmpty = record.productCategoriesCsv.trim().isEmpty;
       final unitsEmpty = record.productUnitsCsv.trim().isEmpty;
@@ -171,7 +177,12 @@ class StoreProfileService extends ChangeNotifier {
       await _ensureDefaultLabelFor(def.labelStoreType);
     });
 
+    if (id == StoreProfileId.restaurant) {
+      await RestaurantFloorSeed.ensureSampleFloor(_isar);
+    }
+
     _configured = markConfigured;
+    _profileId = id;
     _loaded = true;
     notifyListeners();
   }

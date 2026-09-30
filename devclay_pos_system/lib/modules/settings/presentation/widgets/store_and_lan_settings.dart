@@ -11,10 +11,30 @@ import '../../../../core/lan_api/host/shop_host_server.dart';
 import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../core/store_profile/store_profile_service.dart';
 import '../../../../core/store_profile/store_profiles.dart';
+import '../../../../database/collections/app_setting.dart';
+import '../../../../database/isar_service.dart';
 import '../../../../themes/app_spacing.dart';
 import '../../../../widgets/app_button.dart';
+import '../../../../widgets/app_card.dart';
 import '../../../../widgets/app_toast.dart';
 import '../../../../widgets/section_header.dart';
+import 'package:isar_community/isar.dart';
+
+Future<List<String>> lanLocalIpList() async {
+  final out = <String>[];
+  try {
+    final interfaces = await NetworkInterface.list(
+      type: InternetAddressType.IPv4,
+      includeLinkLocal: false,
+    );
+    for (final iface in interfaces) {
+      for (final addr in iface.addresses) {
+        if (!addr.isLoopback) out.add(addr.address);
+      }
+    }
+  } catch (_) {}
+  return out;
+}
 
 /// Store type picker + optional reset of categories/units.
 class StoreTypeSettingsCard extends StatefulWidget {
@@ -325,21 +345,7 @@ class _LanMultiDeviceSettingsCardState
     }
   }
 
-  Future<List<String>> _localIpList() async {
-    final out = <String>[];
-    try {
-      final interfaces = await NetworkInterface.list(
-        type: InternetAddressType.IPv4,
-        includeLinkLocal: false,
-      );
-      for (final iface in interfaces) {
-        for (final addr in iface.addresses) {
-          if (!addr.isLoopback) out.add(addr.address);
-        }
-      }
-    } catch (_) {}
-    return out;
-  }
+  Future<List<String>> _localIpList() => lanLocalIpList();
 
   Future<void> _copy(String value) async {
     await Clipboard.setData(ClipboardData(text: value));
@@ -520,6 +526,152 @@ class _LanMultiDeviceSettingsCardState
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Restaurant LAN guest ordering (web-to-table).
+class WebToTableSettingsCard extends StatefulWidget {
+  const WebToTableSettingsCard({super.key});
+
+  @override
+  State<WebToTableSettingsCard> createState() => _WebToTableSettingsCardState();
+}
+
+class _WebToTableSettingsCardState extends State<WebToTableSettingsCard> {
+  bool _enabled = false;
+  bool _floor = false;
+  bool _busy = false;
+  final _pin = TextEditingController();
+  final _servicePct = TextEditingController();
+  List<String> _ips = const [];
+  int _port = 8080;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  @override
+  void dispose() {
+    _pin.dispose();
+    _servicePct.dispose();
+    super.dispose();
+  }
+
+  Future<void> _load() async {
+    final isar = sl<IsarService>().instance;
+    final settings = await isar.appSettings
+        .filter()
+        .keyEqualTo('default')
+        .findFirst();
+    final ips = await lanLocalIpList();
+    if (!mounted) return;
+    setState(() {
+      _enabled = settings?.enableWebToTable ?? false;
+      _floor = settings?.enableRestaurantFloor ?? false;
+      _pin.text = settings?.webToTablePin ?? '';
+      _servicePct.text = '${settings?.defaultServiceChargePct ?? 0}';
+      _ips = ips;
+      _port = sl<LanModeService>().bindPort;
+    });
+  }
+
+  Future<void> _save() async {
+    setState(() => _busy = true);
+    try {
+      final isar = sl<IsarService>().instance;
+      final settings = await isar.appSettings
+          .filter()
+          .keyEqualTo('default')
+          .findFirst();
+      if (settings == null) return;
+      await isar.writeTxn(() async {
+        settings
+          ..enableWebToTable = _enabled
+          ..enableRestaurantFloor = _floor || _enabled
+          ..webToTablePin = _pin.text.trim()
+          ..defaultServiceChargePct =
+              double.tryParse(_servicePct.text.trim()) ?? 0;
+        if (settings.webToTableTokenSecret.isEmpty) {
+          settings.webToTableTokenSecret =
+              DateTime.now().millisecondsSinceEpoch.toRadixString(16);
+        }
+        await isar.appSettings.put(settings);
+      });
+      if (_enabled && !sl<ShopHostServer>().isRunning) {
+        await sl<LanModeService>().setMode(LanDeviceMode.host);
+        await sl<ShopHostServer>().start();
+      }
+      if (!mounted) return;
+      AppToast.show(context, 'Web-to-table settings saved');
+      await _load();
+    } catch (e) {
+      if (!mounted) return;
+      AppToast.show(context, e.toString(), tone: AppToastTone.error);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final profile = sl<StoreProfileService>().profileIdCached;
+    if (profile != StoreProfileId.restaurant) {
+      return const SizedBox.shrink();
+    }
+    final urls = [
+      for (final ip in _ips) 'http://$ip:$_port/guest/',
+    ];
+    return AppCard(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Web-to-table (LAN)', style: theme.textTheme.titleMedium),
+          const SizedBox(height: 4),
+          Text(
+            'Guests scan table QR codes on the shop Wi‑Fi. No cloud required.',
+            style: theme.textTheme.bodySmall,
+          ),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: const Text('Enable guest ordering'),
+            value: _enabled,
+            onChanged: (v) => setState(() => _enabled = v),
+          ),
+          TextField(
+            controller: _pin,
+            decoration: const InputDecoration(
+              labelText: 'Staff accept PIN (optional)',
+              helperText: 'Leave empty to auto-accept web orders',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          TextField(
+            controller: _servicePct,
+            decoration: const InputDecoration(
+              labelText: 'Default service charge %',
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.number,
+          ),
+          if (urls.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text('Guest URL (start Shop Host):', style: theme.textTheme.labelLarge),
+            for (final u in urls)
+              SelectableText(u, style: theme.textTheme.bodySmall),
+          ],
+          const SizedBox(height: AppSpacing.md),
+          AppButton(
+            label: _busy ? 'Saving…' : 'Save web-to-table',
+            onPressed: _busy ? null : _save,
+          ),
+        ],
+      ),
     );
   }
 }

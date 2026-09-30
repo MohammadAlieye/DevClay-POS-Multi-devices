@@ -3,6 +3,7 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:devclay_pos_system/database/collections/product.dart';
+import 'package:devclay_pos_system/database/collections/product_variant.dart';
 import 'package:devclay_pos_system/database/collections/app_setting.dart';
 import 'package:devclay_pos_system/database/isar_service.dart';
 import 'package:devclay_pos_system/modules/products/data/datasources/products_local_datasource.dart';
@@ -75,7 +76,7 @@ void main() {
       'devclay_product_validation_',
     );
     isar = await Isar.open(
-      [ProductSchema, AppSettingSchema],
+      [ProductSchema, ProductVariantSchema, AppSettingSchema],
       directory: testDirectory.path,
       name: 'product_validation_${DateTime.now().microsecondsSinceEpoch}',
     );

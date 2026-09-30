@@ -18,7 +18,7 @@ class ProductsLocalDataSource {
   final ProductImageStore _imageStore;
 
   void _guardClientWrites() {
-    if (sl<LanModeService>().isClient) {
+    if (sl.isRegistered<LanModeService>() && sl<LanModeService>().isClient) {
       throw StateError('Manage products on the shop host PC.');
     }
   }

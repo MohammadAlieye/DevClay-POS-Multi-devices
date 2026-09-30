@@ -96,4 +96,19 @@ class AppSetting {
 
   /// Preferred [LabelStoreType] name for labels module.
   String preferredLabelStoreType = 'retail';
+
+  /// Restaurant: floor map + table checks.
+  bool enableRestaurantFloor = false;
+
+  /// Restaurant: LAN guest web-to-table ordering.
+  bool enableWebToTable = false;
+
+  /// Optional PIN staff must enter to accept web orders (empty = auto-accept).
+  String webToTablePin = '';
+
+  double defaultServiceChargePct = 0;
+  double defaultCoverCharge = 0;
+
+  /// Secret used to HMAC guest table QR tokens (generated once).
+  String webToTableTokenSecret = '';
 }

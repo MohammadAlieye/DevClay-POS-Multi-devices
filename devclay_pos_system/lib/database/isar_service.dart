@@ -12,12 +12,16 @@ import 'collections/audit_entry.dart';
 import 'collections/app_notification.dart';
 import 'collections/auth_session.dart';
 import 'collections/dashboard_metric.dart';
+import 'collections/dining_floor.dart';
+import 'collections/dining_table.dart';
 import 'collections/held_sale.dart';
+import 'collections/kitchen_ticket.dart';
 import 'collections/low_stock_item.dart';
 import 'collections/product.dart';
 import 'collections/product_batch.dart';
 import 'collections/product_variant.dart';
 import 'collections/recent_sale.dart';
+import 'collections/restaurant_check.dart';
 import 'collections/sale.dart';
 import 'collections/sales_point.dart';
 import 'collections/customer.dart';
@@ -48,7 +52,7 @@ class IsarService {
 
   // Bump only when a collection schema changes. Before opening a database
   // from an older revision, a one-time safety copy is created beside it.
-  static const schemaRevision = '2026-09-30-store-profile-variants-v1';
+  static const schemaRevision = '2026-09-30-restaurant-floor-v1';
 
   static const List<CollectionSchema> schemas = [
     DashboardMetricSchema,
@@ -85,6 +89,10 @@ class IsarService {
     AppSettingSchema,
     LabelTemplateSchema,
     LabelPrintJobSchema,
+    DiningFloorSchema,
+    DiningTableSchema,
+    RestaurantCheckSchema,
+    KitchenTicketSchema,
   ];
 
   Isar? _isar;

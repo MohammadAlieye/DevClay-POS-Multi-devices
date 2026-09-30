@@ -27,6 +27,19 @@ class DashboardData extends Equatable {
     required this.expiryWatchItems,
     required this.topDebtors,
     required this.notifications,
+    this.todayReceiptCount = 0,
+    this.avgTicket = 0,
+    this.voidedToday = 0,
+    this.returnsToday = 0,
+    this.paymentMix = const PaymentMix(),
+    this.hourlySalesToday = const [],
+    this.staffSalesToday = const [],
+    this.openTables = 0,
+    this.seatedGuests = 0,
+    this.avgTableTurnMinutes = 0,
+    this.webOrdersPending = 0,
+    this.kitchenOpenTickets = 0,
+    this.isRestaurant = false,
   });
 
   final double todaySales;
@@ -37,26 +50,16 @@ class DashboardData extends Equatable {
   final double todayProfitChange;
   final double monthlySalesChange;
   final double monthlyProfitChange;
-
-  /// Today's sales paid (fully or partly) via Khata / Udhar.
   final double todayKhataSales;
   final double todayExpenses;
   final double monthlyExpenses;
-
-  /// Sum of positive customer balances (customers owe shop).
   final double receivablesDue;
-
-  /// Sum of open purchase due amounts.
   final double payablesDue;
-
-  /// Sum of active account balances.
   final double cashOnHand;
-
   final int heldSalesCount;
   final int expiredProductCount;
   final int expiringSoonCount;
   final DateTime? lastBackupAt;
-
   final List<SalesSeriesPoint> salesSeries;
   final List<TopProductItem> topProducts;
   final List<RecentSaleItem> recentSales;
@@ -64,6 +67,21 @@ class DashboardData extends Equatable {
   final List<ExpiryWatchItem> expiryWatchItems;
   final List<KhataDebtorItem> topDebtors;
   final List<DashboardNotification> notifications;
+
+  final int todayReceiptCount;
+  final double avgTicket;
+  final double voidedToday;
+  final double returnsToday;
+  final PaymentMix paymentMix;
+  final List<HourlySalesPoint> hourlySalesToday;
+  final List<StaffSalesItem> staffSalesToday;
+
+  final int openTables;
+  final int seatedGuests;
+  final double avgTableTurnMinutes;
+  final int webOrdersPending;
+  final int kitchenOpenTickets;
+  final bool isRestaurant;
 
   int? get backupAgeDays {
     final at = lastBackupAt;
@@ -103,7 +121,89 @@ class DashboardData extends Equatable {
         expiryWatchItems,
         topDebtors,
         notifications,
+        todayReceiptCount,
+        avgTicket,
+        voidedToday,
+        returnsToday,
+        paymentMix,
+        hourlySalesToday,
+        staffSalesToday,
+        openTables,
+        seatedGuests,
+        avgTableTurnMinutes,
+        webOrdersPending,
+        kitchenOpenTickets,
+        isRestaurant,
       ];
+}
+
+class PaymentMix extends Equatable {
+  const PaymentMix({
+    this.cash = 0,
+    this.card = 0,
+    this.wallet = 0,
+    this.khata = 0,
+    this.split = 0,
+    this.other = 0,
+  });
+
+  final double cash;
+  final double card;
+  final double wallet;
+  final double khata;
+  final double split;
+  final double other;
+
+  double get total => cash + card + wallet + khata + split + other;
+
+  factory PaymentMix.fromJson(Map<String, dynamic>? json) {
+    if (json == null) return const PaymentMix();
+    return PaymentMix(
+      cash: (json['cash'] as num?)?.toDouble() ?? 0,
+      card: (json['card'] as num?)?.toDouble() ?? 0,
+      wallet: (json['wallet'] as num?)?.toDouble() ?? 0,
+      khata: (json['khata'] as num?)?.toDouble() ?? 0,
+      split: (json['split'] as num?)?.toDouble() ?? 0,
+      other: (json['other'] as num?)?.toDouble() ?? 0,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+        'cash': cash,
+        'card': card,
+        'wallet': wallet,
+        'khata': khata,
+        'split': split,
+        'other': other,
+      };
+
+  @override
+  List<Object?> get props => [cash, card, wallet, khata, split, other];
+}
+
+class HourlySalesPoint extends Equatable {
+  const HourlySalesPoint({required this.hour, required this.amount});
+
+  final int hour;
+  final double amount;
+
+  @override
+  List<Object?> get props => [hour, amount];
+}
+
+class StaffSalesItem extends Equatable {
+  const StaffSalesItem({
+    required this.name,
+    required this.amount,
+    required this.receipts,
+  });
+
+  final String name;
+  final double amount;
+  final int receipts;
+
+  @override
+  List<Object?> get props => [name, amount, receipts];
 }
 
 class SalesSeriesPoint extends Equatable {

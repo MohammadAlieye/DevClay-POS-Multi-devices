@@ -13,8 +13,11 @@ class CustomersRepositoryImpl implements CustomersRepository {
   }
 
   @override
-  Future<List<CustomerSaleSummary>> getCustomerSales(String customerName) {
-    return _local.getCustomerSales(customerName);
+  Future<List<CustomerSaleSummary>> getCustomerSales(
+    String customerName, {
+    int? customerId,
+  }) {
+    return _local.getCustomerSales(customerName, customerId: customerId);
   }
 
   @override

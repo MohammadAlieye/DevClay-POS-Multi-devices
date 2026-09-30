@@ -68,6 +68,7 @@ class _StoreProfileSetupPageState extends State<StoreProfileSetupPage> {
         StoreProfileId.milk => Symbols.water_full,
         StoreProfileId.superStore => Symbols.storefront,
         StoreProfileId.generalRetail => Symbols.shopping_bag,
+        StoreProfileId.restaurant => Symbols.restaurant,
       };
 
   @override

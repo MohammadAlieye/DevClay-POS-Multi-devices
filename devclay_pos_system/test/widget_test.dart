@@ -222,14 +222,9 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Tea carton (TEA-1)').last);
     await tester.pumpAndSettle();
-    await tester.ensureVisible(find.byKey(const ValueKey('purchase-receive-row')));
+    await tester.ensureVisible(find.text('Unit'));
     await tester.pumpAndSettle();
-    await tester.tap(
-      find.descendant(
-        of: find.byKey(const ValueKey('purchase-receive-row')),
-        matching: find.text('Item'),
-      ),
-    );
+    await tester.tap(find.text('Item'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Box').last);
     await tester.pumpAndSettle();

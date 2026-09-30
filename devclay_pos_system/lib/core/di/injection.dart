@@ -77,6 +77,7 @@ import '../../modules/products/data/datasources/products_local_datasource.dart';
 import '../../modules/products/data/products_repository_impl.dart';
 import '../../modules/products/domain/repositories/products_repository.dart';
 import '../../modules/products/presentation/bloc/products_bloc.dart';
+import '../../modules/restaurant/data/datasources/restaurant_local_datasource.dart';
 import '../../routes/app_router.dart';
 import '../../services/hardware/desktop_hardware_service.dart';
 import '../../services/hardware/hardware_service.dart';
@@ -105,10 +106,17 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<LanModeService>(() => LanModeService());
   await sl<LanModeService>().load();
   sl.registerLazySingleton<SaleWriteService>(() => SaleWriteService(sl()));
-  sl.registerLazySingleton<ShopHostServer>(
-    () => ShopHostServer(sl(), sl(), sl()),
+  sl.registerLazySingleton<RestaurantLocalDataSource>(
+    () => RestaurantLocalDataSource(sl()),
   );
-  sl.registerLazySingleton<LanApiClient>(() => LanApiClient(sl()));
+  sl.registerLazySingleton<ShopHostServer>(
+    () => ShopHostServer(sl(), sl(), sl(), sl()),
+  );
+  sl.registerLazySingleton<LanApiClient>(() {
+    final client = LanApiClient(sl());
+    unawaited(client.loadToken());
+    return client;
+  });
   sl.registerLazySingleton<LanConnectionMonitor>(
     () => LanConnectionMonitor(sl(), sl()),
   );
@@ -259,6 +267,9 @@ Future<void> configureDependencies() async {
   );
   sl.registerLazySingleton<SettingsRepository>(
     () => SettingsRepositoryImpl(sl()),
+  );
+  unawaited(
+    sl<SettingsLocalDataSource>().autoBackupIfDue().catchError((_) => null),
   );
   sl.registerFactory<SettingsBloc>(() => SettingsBloc(sl()));
 

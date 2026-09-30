@@ -68,6 +68,29 @@ void main() {
       expect(late!.quantity, 3);
     });
 
+    test('applies lineDiscount and honors batchId together', () async {
+      final result = await h.saleWrite.createSale(
+        cashSaleDto(
+          h,
+          productId: h.fixtures.productId,
+          qty: 2,
+          unitPrice: 100,
+          batchId: h.fixtures.batchLateId,
+          lineDiscount: 20,
+          totalOverride: 180,
+          discountOverride: 0,
+        ),
+      );
+      final sale = await h.isar.sales.get(result['id'] as int);
+      expect(sale!.total, 180);
+      final lines = jsonDecode(sale.linesJson) as List;
+      expect((lines.first as Map)['lineDiscount'], 20);
+      final late = await h.isar.productBatchs.get(h.fixtures.batchLateId);
+      final early = await h.isar.productBatchs.get(h.fixtures.batchEarlyId);
+      expect(late!.quantity, 3);
+      expect(early!.quantity, 5);
+    });
+
     test('stores batch allocations on sale lines', () async {
       final result = await h.saleWrite.createSale(
         cashSaleDto(
@@ -179,21 +202,26 @@ void main() {
       expect(entries.last.amount, 50);
     });
 
-    test('documented gap: khata without customer skips ledger silently',
-        () async {
-      final result = await h.saleWrite.createSale(
-        cashSaleDto(
-          h,
-          productId: h.fixtures.productId,
-          qty: 1,
-          unitPrice: 100,
-          methodKind: 'khata',
-          amountPaid: 0,
+    test('khata without customer is rejected', () async {
+      await expectLater(
+        h.saleWrite.createSale(
+          cashSaleDto(
+            h,
+            productId: h.fixtures.productId,
+            qty: 1,
+            unitPrice: 100,
+            methodKind: 'khata',
+            amountPaid: 0,
+          ),
+        ),
+        throwsA(
+          isA<LanApiException>().having(
+            (e) => e.code,
+            'code',
+            'khata_customer_required',
+          ),
         ),
       );
-      expect(result['id'], isA<int>());
-      final entries = await h.isar.customerLedgerEntrys.where().findAll();
-      expect(entries, isEmpty);
     });
   });
 
@@ -272,7 +300,7 @@ void main() {
   });
 
   group('integrity / trust boundaries', () {
-    test('documented gap: host trusts client-provided totals', () async {
+    test('host recomputes totals instead of trusting client override', () async {
       final result = await h.saleWrite.createSale(
         cashSaleDto(
           h,
@@ -283,35 +311,28 @@ void main() {
         ),
       );
       final sale = await h.isar.sales.get(result['id'] as int);
-      expect(sale!.total, 1);
-      expect(result['total'], 1);
+      expect(sale!.total, 100);
+      expect(result['total'], 100);
     });
 
-    test('documented gap: inactive product can still be sold by id', () async {
-      // Seed stock lot for inactive product so deduct can succeed.
-      final inactive =
-          await h.isar.products.get(h.fixtures.inactiveProductId);
-      await h.isar.writeTxn(() async {
-        await h.isar.productBatchs.put(
-          ProductBatch()
-            ..productId = inactive!.id
-            ..quantity = 5
-            ..receivedAt = DateTime.now()
-            ..batchCode = 'B-OFF',
-        );
-        inactive.stock = 5;
-        await h.isar.products.put(inactive);
-      });
-
-      final result = await h.saleWrite.createSale(
-        cashSaleDto(
-          h,
-          productId: h.fixtures.inactiveProductId,
-          qty: 1,
-          unitPrice: 10,
+    test('inactive product cannot be sold', () async {
+      await expectLater(
+        h.saleWrite.createSale(
+          cashSaleDto(
+            h,
+            productId: h.fixtures.inactiveProductId,
+            qty: 1,
+            unitPrice: 10,
+          ),
+        ),
+        throwsA(
+          isA<LanApiException>().having(
+            (e) => e.code,
+            'code',
+            'product_inactive',
+          ),
         ),
       );
-      expect(result['id'], isA<int>());
     });
 
     test('invalid quantity throws LanApiException', () async {

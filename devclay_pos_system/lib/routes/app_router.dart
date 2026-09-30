@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../core/auth/go_router_refresh_stream.dart';
 import '../core/auth/permissions.dart';
 import '../core/di/injection.dart';
+import '../core/lan_api/lan_client_gates.dart';
+import '../core/lan_api/lan_mode_service.dart';
 import '../core/store_profile/store_profile_service.dart';
 import '../modules/auth/domain/entities/auth_entities.dart';
 import '../modules/auth/presentation/bloc/auth_bloc.dart';
@@ -26,6 +28,8 @@ import '../modules/inventory/presentation/pages/inventory_page.dart';
 import '../modules/pos/presentation/pages/pos_page.dart';
 import '../modules/products/presentation/pages/products_page.dart';
 import '../modules/recycle_bin/presentation/pages/recycle_bin_page.dart';
+import '../modules/restaurant/presentation/pages/kitchen_display_page.dart';
+import '../modules/restaurant/presentation/pages/restaurant_floor_page.dart';
 import '../modules/setup/presentation/pages/store_profile_setup_page.dart';
 import '../modules/shell/presentation/app_shell.dart';
 import '../themes/app_durations.dart';
@@ -120,6 +124,13 @@ GoRouter createAppRouter() {
             !authState.session.user.hasPermission(required) &&
             location != _homeRouteFor(authState.session.user)) {
           return _homeRouteFor(authState.session.user);
+        }
+
+        if (sl.isRegistered<LanModeService>() &&
+            sl<LanModeService>().isClient &&
+            isClientBlockedRoute(location)) {
+          final home = _homeRouteFor(authState.session.user);
+          return location == home ? null : home;
         }
       }
 
@@ -216,6 +227,16 @@ GoRouter createAppRouter() {
                 _fadeSlide(state, const LabelsPage()),
           ),
           GoRoute(
+            path: AppRoutes.restaurantFloor,
+            pageBuilder: (context, state) =>
+                _fadeSlide(state, const RestaurantFloorPage()),
+          ),
+          GoRoute(
+            path: AppRoutes.kitchen,
+            pageBuilder: (context, state) =>
+                _fadeSlide(state, const KitchenDisplayPage()),
+          ),
+          GoRoute(
             path: AppRoutes.recycleBin,
             pageBuilder: (context, state) =>
                 _fadeSlide(state, const RecycleBinPage()),
@@ -247,6 +268,8 @@ String? _permissionForRoute(String location) {
     AppRoutes.finance => AppPermission.accountsView,
     AppRoutes.reports => AppPermission.reportsView,
     AppRoutes.labels => AppPermission.labelsPrint,
+    AppRoutes.restaurantFloor => AppPermission.restaurantManage,
+    AppRoutes.kitchen => AppPermission.kitchenView,
     AppRoutes.users => AppPermission.usersManage,
     AppRoutes.settings => AppPermission.settingsManage,
     AppRoutes.recycleBin => AppPermission.settingsManage,

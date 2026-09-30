@@ -7,11 +7,7 @@ import '../support/isar_test_bootstrap.dart';
 import 'lan_sale_fixtures.dart';
 import 'lan_test_harness.dart';
 
-/// Living registry of production gaps found by the LAN test suite.
-///
-/// Each test asserts *current* (flawed) behavior so CI stays green, and the
-/// test name + reason document what must be fixed before multi-device rollout.
-/// When a flaw is fixed, flip the expectation to the secure/correct contract.
+/// Production-contract tests — secure/correct LAN behavior after P0 fixes.
 void main() {
   late LanTestHarness h;
 
@@ -25,7 +21,7 @@ void main() {
     await h.dispose();
   });
 
-  test('FLAW-01: POST /sales is unauthenticated on LAN', () async {
+  test('POST /sales without auth returns 401', () async {
     final res = await h.post(
       LanApiPaths.sales,
       cashSaleDto(
@@ -34,18 +30,17 @@ void main() {
         qty: 1,
         unitPrice: 100,
       ).toJson(),
+      authed: false,
     );
-    expect(res.statusCode, 200,
-        reason: 'Current: open write. Fix: require session/token → 401');
+    expect(res.statusCode, 401);
   });
 
-  test('FLAW-02: GET /products exposes catalog without auth', () async {
-    final res = await h.get(LanApiPaths.products);
-    expect(res.statusCode, 200,
-        reason: 'Current: open read. Fix: require session/token → 401');
+  test('GET /products without auth returns 401', () async {
+    final res = await h.get(LanApiPaths.products, authed: false);
+    expect(res.statusCode, 401);
   });
 
-  test('FLAW-03: host trusts client-provided sale totals', () async {
+  test('host recomputes sale total from lines', () async {
     final res = await h.post(
       LanApiPaths.sales,
       cashSaleDto(
@@ -58,11 +53,10 @@ void main() {
     );
     expect(res.statusCode, 200);
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    expect(body['total'], 1,
-        reason: 'Current: trusts client. Fix: recompute total from lines → 100');
+    expect(body['total'], 100);
   });
 
-  test('FLAW-04: inactive products can be sold via LAN', () async {
+  test('inactive products cannot be sold', () async {
     final res = await h.post(
       LanApiPaths.sales,
       cashSaleDto(
@@ -72,11 +66,12 @@ void main() {
         unitPrice: 10,
       ).toJson(),
     );
-    expect(res.statusCode, 200,
-        reason: 'Current: sells inactive. Fix: reject isActive=false');
+    expect(res.statusCode, anyOf(400, 404));
+    final body = jsonDecode(res.body) as Map<String, dynamic>;
+    expect(body['code'], anyOf('product_inactive', 'product_missing'));
   });
 
-  test('FLAW-05: insufficient stock returns generic error code', () async {
+  test('insufficient stock returns insufficient_stock code', () async {
     final res = await h.post(
       LanApiPaths.sales,
       cashSaleDto(
@@ -88,13 +83,10 @@ void main() {
     );
     expect(res.statusCode, 400);
     final body = jsonDecode(res.body) as Map<String, dynamic>;
-    expect(body['code'], 'error',
-        reason:
-            'Current: StateError → code=error. Fix: LanApiException insufficient_stock');
-    expect('${body['error']}'.toLowerCase(), contains('insufficient'));
+    expect(body['code'], 'insufficient_stock');
   });
 
-  test('FLAW-06: khata without customerId is accepted', () async {
+  test('khata without customerId is rejected', () async {
     final res = await h.post(
       LanApiPaths.sales,
       cashSaleDto(
@@ -106,18 +98,13 @@ void main() {
         amountPaid: 0,
       ).toJson(),
     );
-    expect(res.statusCode, 200,
-        reason: 'Current: accepts. Fix: require customerId for khata → 400');
+    expect(res.statusCode, 400);
+    final body = jsonDecode(res.body) as Map<String, dynamic>;
+    expect(body['code'], 'khata_customer_required');
   });
 
-  test('FLAW-07: LanApiClient missing next-invoice preview helper', () async {
-    final res = await h.get(LanApiPaths.nextInvoicePreview);
-    expect(res.statusCode, 200);
-    // Client has health/login/products/sales but no fetchNextInvoicePreview().
-    expect(
-      h.client.toString().contains('LanApiClient'),
-      isTrue,
-      reason: 'Add LanApiClient.fetchNextInvoicePreview() wrapping this path',
-    );
+  test('LanApiClient exposes next-invoice preview', () async {
+    final preview = await h.client.fetchNextInvoicePreview();
+    expect(preview, startsWith('INV-'));
   });
 }

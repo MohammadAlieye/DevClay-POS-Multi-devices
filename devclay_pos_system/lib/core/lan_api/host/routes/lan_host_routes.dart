@@ -7,6 +7,7 @@ import 'package:shelf_router/shelf_router.dart';
 import '../../../../database/collections/account.dart';
 import '../../../../database/collections/app_setting.dart';
 import '../../../../database/collections/customer.dart';
+import '../../../../database/collections/customer_ledger_entry.dart';
 import '../../../../database/collections/product.dart';
 import '../../../../database/collections/product_batch.dart';
 import '../../../../database/collections/product_variant.dart';
@@ -14,19 +15,26 @@ import '../../../../database/collections/sale.dart';
 import '../../../../database/collections/user_account.dart';
 import '../../../../database/isar_service.dart';
 import '../../../../database/product_batch_store.dart';
+import '../../../../modules/restaurant/data/datasources/restaurant_local_datasource.dart';
 import '../../../auth/password_hasher.dart';
 import '../../dtos/lan_dtos.dart';
 import '../../lan_api_errors.dart';
 import '../../lan_api_paths.dart';
+import '../lan_auth_token_store.dart';
 import '../sale_write_service.dart';
+import 'lan_host_ops.dart';
+import 'lan_restaurant_routes.dart';
 
 /// Registers all /api/v1 host routes on [router].
 void mountLanHostRoutes(
   Router router, {
   required IsarService isarService,
   required SaleWriteService saleWrite,
+  required LanAuthTokenStore tokens,
+  RestaurantLocalDataSource? restaurant,
 }) {
   final isar = isarService.instance;
+  final ops = LanHostOps(isarService);
 
   router.get(LanApiPaths.health, (Request request) async {
     final settings = await _settings(isar);
@@ -64,12 +72,20 @@ void mountLanHostRoutes(
       )) {
         return _err('Invalid credentials', status: 401, code: 'auth_failed');
       }
+      final session = tokens.issue(
+        userId: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role,
+        permissions: user.permissions,
+      );
       return _ok({
         'id': user.id,
         'username': user.username,
         'displayName': user.displayName,
         'role': user.role,
         'permissions': user.permissions,
+        'token': session.token,
       });
     } catch (e) {
       return _err(e.toString(), status: 400);
@@ -123,7 +139,7 @@ void mountLanHostRoutes(
     final productId = int.tryParse(id);
     if (productId == null) return _err('Invalid id', status: 400);
     final product = await isar.products.get(productId);
-    if (product == null || product.deletedAt != null) {
+    if (product == null || product.deletedAt != null || !product.isActive) {
       return _err('Not found', status: 404);
     }
     final variants = await isar.productVariants
@@ -136,7 +152,8 @@ void mountLanHostRoutes(
   });
 
   router.get(LanApiPaths.customers, (Request request) async {
-    final customers = await isar.customers.filter().isActiveEqualTo(true).findAll();
+    final customers =
+        await isar.customers.filter().isActiveEqualTo(true).findAll();
     customers.sort((a, b) => a.name.compareTo(b.name));
     return _ok({
       'items': [
@@ -181,6 +198,84 @@ void mountLanHostRoutes(
     } catch (e) {
       return _err(e.toString(), status: 400);
     }
+  });
+
+  router.post('${LanApiPaths.customerPayment}<id|[0-9]+>/payments', (
+    Request request,
+    String id,
+  ) async {
+    try {
+      final customerId = int.tryParse(id);
+      if (customerId == null) return _err('Invalid id', status: 400);
+      final body =
+          jsonDecode(await request.readAsString()) as Map<String, dynamic>;
+      final amount = (body['amount'] as num?)?.toDouble() ?? 0;
+      final note = body['note'] as String?;
+      final result = await ops.recordCustomerPayment(
+        customerId: customerId,
+        amount: amount,
+        note: note,
+      );
+      return _ok(result);
+    } on LanApiException catch (e) {
+      return _err(e.message, status: e.statusCode ?? 400, code: e.code);
+    } catch (e) {
+      return _err(e.toString(), status: 400);
+    }
+  });
+
+  router.get('${LanApiPaths.customerById}<id|[0-9]+>/ledger', (
+    Request request,
+    String id,
+  ) async {
+    final customerId = int.tryParse(id);
+    if (customerId == null) return _err('Invalid id', status: 400);
+    final rows = await isar.customerLedgerEntrys
+        .filter()
+        .customerIdEqualTo(customerId)
+        .sortByEntryDateDesc()
+        .findAll();
+    return _ok({
+      'items': [
+        for (final row in rows)
+          {
+            'id': row.id,
+            'type': row.type,
+            'amount': row.amount,
+            'balanceAfter': row.balanceAfter,
+            'entryDate': row.entryDate.toIso8601String(),
+            'reference': row.reference,
+            'note': row.note,
+          },
+      ],
+    });
+  });
+
+  router.get('${LanApiPaths.customerById}<id|[0-9]+>/sales', (
+    Request request,
+    String id,
+  ) async {
+    final customerId = int.tryParse(id);
+    if (customerId == null) return _err('Invalid id', status: 400);
+    final customer = await isar.customers.get(customerId);
+    if (customer == null) return _err('Not found', status: 404);
+    final nameKey = customer.name.trim().toLowerCase();
+    final sales = await isar.sales.where().sortBySoldAtDesc().findAll();
+    final matched = sales.where((s) {
+      if (s.customerId == customerId) return true;
+      return s.customerName.trim().toLowerCase() == nameKey;
+    });
+    return _ok({
+      'items': [
+        for (final sale in matched)
+          {
+            'invoiceNo': sale.invoiceNo,
+            'total': sale.total,
+            'soldAt': sale.soldAt.toIso8601String(),
+            'paymentMethod': sale.paymentMethod,
+          },
+      ],
+    });
   });
 
   router.get(LanApiPaths.paymentAccounts, (Request request) async {
@@ -249,6 +344,73 @@ void mountLanHostRoutes(
       return _err(e.toString(), status: 400);
     }
   });
+
+  router.post('${LanApiPaths.saleReturn}<id|[0-9]+>/returns', (
+    Request request,
+    String id,
+  ) async {
+    try {
+      final saleId = int.tryParse(id);
+      if (saleId == null) return _err('Invalid id', status: 400);
+      final body =
+          jsonDecode(await request.readAsString()) as Map<String, dynamic>;
+      final result = await ops.processReturn(
+        saleId: saleId,
+        body: body,
+      );
+      return _ok(result);
+    } on LanApiException catch (e) {
+      return _err(e.message, status: e.statusCode ?? 400, code: e.code);
+    } catch (e) {
+      return _err(e.toString(), status: 400);
+    }
+  });
+
+  router.get(LanApiPaths.heldSales, (Request request) async {
+    return _ok({'items': await ops.listHeldSales()});
+  });
+
+  router.post(LanApiPaths.heldSales, (Request request) async {
+    try {
+      final body =
+          jsonDecode(await request.readAsString()) as Map<String, dynamic>;
+      final result = await ops.createHeldSale(body);
+      return _ok(result);
+    } on LanApiException catch (e) {
+      return _err(e.message, status: e.statusCode ?? 400, code: e.code);
+    } catch (e) {
+      return _err(e.toString(), status: 400);
+    }
+  });
+
+  router.delete('${LanApiPaths.heldSaleById}<id|[0-9]+>', (
+    Request request,
+    String id,
+  ) async {
+    final heldId = int.tryParse(id);
+    if (heldId == null) return _err('Invalid id', status: 400);
+    await ops.deleteHeldSale(heldId);
+    return _ok({'ok': true});
+  });
+
+  router.get('${LanApiPaths.heldSaleById}<id|[0-9]+>', (
+    Request request,
+    String id,
+  ) async {
+    final heldId = int.tryParse(id);
+    if (heldId == null) return _err('Invalid id', status: 400);
+    final detail = await ops.getHeldSale(heldId);
+    if (detail == null) return _err('Not found', status: 404);
+    return _ok(detail);
+  });
+
+  router.get(LanApiPaths.dashboardSummary, (Request request) async {
+    return _ok(await ops.dashboardSummary());
+  });
+
+  if (restaurant != null) {
+    mountLanRestaurantRoutes(router, restaurant: restaurant);
+  }
 }
 
 Future<AppSetting?> _settings(Isar isar) {

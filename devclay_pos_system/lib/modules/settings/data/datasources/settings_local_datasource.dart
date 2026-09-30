@@ -147,6 +147,33 @@ class SettingsLocalDataSource {
     return _mapSettings(record, store: store);
   }
 
+  /// Silent scheduled backup into app documents when last backup is older than
+  /// [maxAgeDays] (or never made). Returns the path when a backup ran.
+  Future<String?> autoBackupIfDue({int maxAgeDays = 7}) async {
+    final record = await _getOrCreateRecord();
+    final last = record.lastBackupAt;
+    final now = DateTime.now();
+    if (last != null && now.difference(last).inDays < maxAgeDays) {
+      return null;
+    }
+    final dir = await getApplicationDocumentsDirectory();
+    final backups = Directory('${dir.path}/backups');
+    if (!await backups.exists()) {
+      await backups.create(recursive: true);
+    }
+    final destPath =
+        '${backups.path}/${backupFileName('auto')}';
+    await _copyDatabaseSafely(destPath);
+    final isar = _isarService.instance;
+    await isar.writeTxn(() async {
+      record
+        ..lastBackupAt = DateTime.now()
+        ..lastBackupPath = destPath;
+      await isar.appSettings.put(record);
+    });
+    return destPath;
+  }
+
   Future<AppSettingsSnapshot> importBackup() async {
     final result = await FilePicker.platform.pickFiles(
       dialogTitle: 'Import DevClayPOS backup',

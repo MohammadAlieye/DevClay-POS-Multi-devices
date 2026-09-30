@@ -5,7 +5,10 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/auth/permissions.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/lan_client_gates.dart';
 import '../../../../core/lan_api/lan_mode_service.dart';
+import '../../../../core/store_profile/store_profile_service.dart';
+import '../../../../core/store_profile/store_profiles.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../constants/developer_contact.dart';
 import '../../../../themes/app_colors.dart';
@@ -73,6 +76,18 @@ const List<SidebarItem> kSidebarItems = [
     path: AppRoutes.sales,
     icon: Symbols.receipt_long,
     permission: AppPermission.salesView,
+  ),
+  SidebarItem(
+    label: 'Floor / Tables',
+    path: AppRoutes.restaurantFloor,
+    icon: Symbols.table_restaurant,
+    permission: AppPermission.restaurantManage,
+  ),
+  SidebarItem(
+    label: 'Kitchen',
+    path: AppRoutes.kitchen,
+    icon: Symbols.skillet,
+    permission: AppPermission.kitchenView,
   ),
   SidebarItem(
     label: 'Customers',
@@ -155,21 +170,22 @@ class AppSidebar extends StatelessWidget {
         ? AppSpacing.sidebarCollapsedWidth
         : AppSpacing.sidebarWidth;
     final isClient = sl<LanModeService>().isClient;
-    const clientHidden = {
-      AppRoutes.products,
-      AppRoutes.inventory,
-      AppRoutes.purchases,
-      AppRoutes.finance,
-      AppRoutes.accounts,
-      AppRoutes.users,
-      AppRoutes.recycleBin,
+    final isRestaurant = sl.isRegistered<StoreProfileService>() &&
+        sl<StoreProfileService>().profileIdCached == StoreProfileId.restaurant;
+    const restaurantPaths = {
+      AppRoutes.restaurantFloor,
+      AppRoutes.kitchen,
     };
     final items = kSidebarItems
         .where(
           (item) =>
               item.permission == null || permissions.contains(item.permission),
         )
-        .where((item) => !isClient || !clientHidden.contains(item.path))
+        .where((item) => !isClient || !kClientBlockedRoutes.contains(item.path))
+        .where(
+          (item) =>
+              !restaurantPaths.contains(item.path) || isRestaurant,
+        )
         .toList();
 
     // AnimatedContainer(width:0) + OverflowBox can busy-loop frames on macOS.

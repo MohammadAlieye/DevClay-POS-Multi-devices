@@ -269,3 +269,12 @@ final class PosDismissMessage extends PosEvent {
 final class PosCatalogRefreshRequested extends PosEvent {
   const PosCatalogRefreshRequested();
 }
+
+final class PosWholesaleModeToggled extends PosEvent {
+  const PosWholesaleModeToggled(this.enabled);
+
+  final bool enabled;
+
+  @override
+  List<Object?> get props => [enabled];
+}

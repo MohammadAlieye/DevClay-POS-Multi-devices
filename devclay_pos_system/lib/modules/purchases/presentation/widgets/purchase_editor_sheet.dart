@@ -272,7 +272,7 @@ class _PurchaseEditorDialogState extends State<_PurchaseEditorDialog> {
   int? _editingLineIndex;
   _ReceiveUnit _receiveUnit = _ReceiveUnit.item;
   final _qty = TextEditingController(text: '1');
-  final _pcsPerBox = TextEditingController(text: '6');
+  final _pcsPerBox = TextEditingController(text: '1');
   final _unitCost = TextEditingController();
   final _selling = TextEditingController();
   final _wholesale = TextEditingController();
@@ -439,7 +439,7 @@ class _PurchaseEditorDialogState extends State<_PurchaseEditorDialog> {
       _receiveUnit = _ReceiveUnit.item;
       final product = _selectedProduct;
       if (product != null) {
-        _pcsPerBox.text = '6';
+        _pcsPerBox.text = '1';
         _fillPricesFrom(product);
         _batchCode.text = _nextBatchCode(product);
       } else {
@@ -463,7 +463,7 @@ class _PurchaseEditorDialogState extends State<_PurchaseEditorDialog> {
     _selectedProductId = null;
     _receiveUnit = _ReceiveUnit.item;
     _qty.text = '1';
-    _pcsPerBox.text = '6';
+    _pcsPerBox.text = '1';
     _unitCost.clear();
     _selling.clear();
     _wholesale.clear();

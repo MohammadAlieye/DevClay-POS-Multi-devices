@@ -247,12 +247,14 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     final paid = switch (_method) {
       PaymentMethodKind.cash => cash,
       PaymentMethodKind.card => total,
+      PaymentMethodKind.wallet => total,
       PaymentMethodKind.split => cash + card,
       PaymentMethodKind.khata => cash,
     };
     return (_method == PaymentMethodKind.khata || paid + 0.001 >= total) &&
         (_method != PaymentMethodKind.khata || _selectedCustomer != null) &&
-        (_method != PaymentMethodKind.card ||
+        ((_method != PaymentMethodKind.card &&
+                _method != PaymentMethodKind.wallet) ||
             _bankAccountId != null ||
             _bankAccounts.isEmpty) &&
         (_method != PaymentMethodKind.cash ||
@@ -284,7 +286,11 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     context.read<PosBloc>().add(
       PosPaymentCompleted(
         method: _method,
-        amountPaid: _method == PaymentMethodKind.card ? total : cash,
+        amountPaid:
+            _method == PaymentMethodKind.card ||
+                _method == PaymentMethodKind.wallet
+            ? total
+            : cash,
         cardAmount: _method == PaymentMethodKind.split ? card : 0,
         cashAccountId:
             _method == PaymentMethodKind.cash ||
@@ -294,6 +300,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
             : null,
         bankAccountId:
             _method == PaymentMethodKind.card ||
+                _method == PaymentMethodKind.wallet ||
                 _method == PaymentMethodKind.split
             ? _bankAccountId
             : null,
@@ -370,6 +377,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     final paid = switch (_method) {
       PaymentMethodKind.cash => cash,
       PaymentMethodKind.card => total,
+      PaymentMethodKind.wallet => total,
       PaymentMethodKind.split => cash + card,
       PaymentMethodKind.khata => cash,
     };
@@ -466,6 +474,12 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                         selected: _method == PaymentMethodKind.card,
                         onTap: () =>
                             setState(() => _method = PaymentMethodKind.card),
+                      ),
+                      _MethodChip(
+                        label: 'JazzCash / Easypaisa',
+                        selected: _method == PaymentMethodKind.wallet,
+                        onTap: () =>
+                            setState(() => _method = PaymentMethodKind.wallet),
                       ),
                       _MethodChip(
                         label: 'Split',
@@ -665,7 +679,8 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                             ),
                           ),
                         ],
-                        if (_method != PaymentMethodKind.card) ...[
+                        if (_method != PaymentMethodKind.card &&
+                            _method != PaymentMethodKind.wallet) ...[
                           const SizedBox(height: AppSpacing.sm),
                           TextField(
                             controller: _cashController,

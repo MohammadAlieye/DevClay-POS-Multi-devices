@@ -3,8 +3,11 @@ import 'dart:io';
 
 import 'package:devclay_pos_system/core/auth/password_hasher.dart';
 import 'package:devclay_pos_system/core/lan_api/client/lan_api_client.dart';
+import 'package:devclay_pos_system/core/lan_api/host/lan_auth_token_store.dart';
+import 'package:devclay_pos_system/core/lan_api/host/routes/lan_guest_routes.dart';
 import 'package:devclay_pos_system/core/lan_api/host/routes/lan_host_routes.dart';
 import 'package:devclay_pos_system/core/lan_api/host/sale_write_service.dart';
+import 'package:devclay_pos_system/core/lan_api/lan_api_paths.dart';
 import 'package:devclay_pos_system/core/lan_api/lan_mode_service.dart';
 import 'package:devclay_pos_system/database/collections/account.dart';
 import 'package:devclay_pos_system/database/collections/app_setting.dart';
@@ -14,6 +17,7 @@ import 'package:devclay_pos_system/database/collections/product_variant.dart';
 import 'package:devclay_pos_system/database/collections/user_account.dart';
 import 'package:devclay_pos_system/database/isar_service.dart';
 import 'package:devclay_pos_system/database/product_batch_store.dart';
+import 'package:devclay_pos_system/modules/restaurant/data/datasources/restaurant_local_datasource.dart';
 import 'package:http/http.dart' as http;
 import 'package:isar_community/isar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +45,7 @@ class LanTestHarness {
     required this.server,
     required this.client,
     required this.fixtures,
+    required this.tokens,
   });
 
   final Directory directory;
@@ -51,6 +56,9 @@ class LanTestHarness {
   final HttpServer server;
   final LanApiClient client;
   final LanFixtures fixtures;
+  final LanAuthTokenStore tokens;
+
+  String? authToken;
 
   String get baseUrl => 'http://127.0.0.1:${server.port}';
 
@@ -66,20 +74,31 @@ class LanTestHarness {
     final isarService = TestIsarService(isar);
     final fixtures = await LanFixtures.seed(isar);
     final saleWrite = SaleWriteService(isarService);
+    final tokens = LanAuthTokenStore();
 
     final lanMode = LanModeService();
     await lanMode.load();
     await lanMode.setMode(LanDeviceMode.host);
     await lanMode.setBindPort(0);
 
+    final restaurant = RestaurantLocalDataSource(isarService, forceLocal: true);
+
     final router = Router();
     mountLanHostRoutes(
       router,
       isarService: isarService,
       saleWrite: saleWrite,
+      tokens: tokens,
+      restaurant: restaurant,
+    );
+    mountLanGuestRoutes(
+      router,
+      isarService: isarService,
+      restaurant: restaurant,
     );
     final handler = const Pipeline()
         .addMiddleware(_cors())
+        .addMiddleware(_auth(tokens))
         .addHandler(router.call);
     final server = await shelf_io.serve(
       handler,
@@ -90,7 +109,7 @@ class LanTestHarness {
     await lanMode.setHostAddress(ip: '127.0.0.1', port: server.port);
     await lanMode.setMode(LanDeviceMode.client);
 
-    return LanTestHarness._(
+    final harness = LanTestHarness._(
       directory: directory,
       isar: isar,
       isarService: isarService,
@@ -99,21 +118,48 @@ class LanTestHarness {
       server: server,
       client: LanApiClient(lanMode),
       fixtures: fixtures,
+      tokens: tokens,
     );
+    await harness.loginAsAdmin();
+    return harness;
   }
+
+  Future<void> loginAsAdmin() async {
+    final user = await client.login(
+      username: LanFixtures.adminUsername,
+      password: LanFixtures.adminPassword,
+    );
+    authToken = client.authToken;
+    assert(user.id == fixtures.adminUserId);
+  }
+
+  Map<String, String> _authHeaders({bool json = false}) => {
+        if (json) 'Content-Type': 'application/json',
+        if (authToken != null) 'Authorization': 'Bearer $authToken',
+      };
 
   Future<http.Response> get(
     String path, {
     Map<String, String>? query,
+    bool authed = true,
   }) {
     final uri = Uri.parse('$baseUrl$path').replace(queryParameters: query);
-    return http.get(uri);
+    return http.get(
+      uri,
+      headers: authed ? _authHeaders() : const {},
+    );
   }
 
-  Future<http.Response> post(String path, Object body) {
+  Future<http.Response> post(
+    String path,
+    Object body, {
+    bool authed = true,
+  }) {
     return http.post(
       Uri.parse('$baseUrl$path'),
-      headers: const {'Content-Type': 'application/json'},
+      headers: authed
+          ? _authHeaders(json: true)
+          : const {'Content-Type': 'application/json'},
       body: body is String ? body : jsonEncode(body),
     );
   }
@@ -141,6 +187,33 @@ class LanTestHarness {
     }
   }
 
+  static Middleware _auth(LanAuthTokenStore tokens) {
+    return (inner) {
+      return (request) async {
+        final path = '/${request.url.path}'.replaceAll('//', '/');
+        final isPublic = path == LanApiPaths.health ||
+            path == LanApiPaths.login ||
+            path == '/guest' ||
+            path == '/guest/' ||
+            path.startsWith('/guest/') ||
+            request.method == 'OPTIONS';
+        if (isPublic) return inner(request);
+        final session = tokens.resolve(request.headers['authorization']);
+        if (session == null) {
+          return Response(
+            401,
+            body: jsonEncode({
+              'error': 'Authentication required',
+              'code': 'auth_required',
+            }),
+            headers: const {'Content-Type': 'application/json'},
+          );
+        }
+        return inner(request);
+      };
+    };
+  }
+
   static Middleware _cors() {
     return (inner) {
       return (request) async {
@@ -155,8 +228,9 @@ class LanTestHarness {
 
   static const _corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type, Authorization',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers':
+        'Origin, Content-Type, Authorization, Accept',
   };
 }
 
@@ -427,8 +501,6 @@ class LanFixtures {
   }
 }
 
-/// Minimal matcher helper so harness can throw readable failures without
-/// importing flutter_test into every helper call site.
 class TestFailure implements Exception {
   TestFailure(this.message);
   final String message;

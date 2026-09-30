@@ -258,7 +258,7 @@ class CartLine extends Equatable {
   /// Discount input: percent (e.g. 10) or fixed Rs (e.g. 100).
   final double lineDiscount;
   final LineDiscountMode lineDiscountMode;
-  @Deprecated('Catalog price is always used; kept for held-sale decode only.')
+  @Deprecated('Prefer overrideUnitPrice for wholesale; kept for held-sale decode.')
   final double? overrideUnitPrice;
   final double? overrideLineTotal;
   final String? quantityLabel;
@@ -277,8 +277,8 @@ class CartLine extends Equatable {
   double get qtyFactor =>
       isVariableSale || product.isVariable ? displayQuantity : quantity.toDouble();
 
-  /// Always the catalog selling price — never overridden in cart.
-  double get unitPrice => product.sellingPrice;
+  /// Catalog selling price, or [overrideUnitPrice] when set (e.g. wholesale).
+  double get unitPrice => overrideUnitPrice ?? product.sellingPrice;
 
   double get originalSubtotal => unitPrice * qtyFactor;
 
@@ -485,7 +485,7 @@ class CompletedSale extends Equatable {
   ];
 }
 
-enum PaymentMethodKind { cash, card, split, khata }
+enum PaymentMethodKind { cash, card, split, khata, wallet }
 
 class PosCustomer extends Equatable {
   const PosCustomer({

@@ -19,4 +19,6 @@ abstract final class AppRoutes {
   static const String settings = '/settings';
   static const String labels = '/labels';
   static const String recycleBin = '/recycle-bin';
+  static const String restaurantFloor = '/restaurant/floor';
+  static const String kitchen = '/restaurant/kitchen';
 }

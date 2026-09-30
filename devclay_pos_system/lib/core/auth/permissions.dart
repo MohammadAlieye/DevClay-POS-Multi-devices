@@ -18,6 +18,8 @@ abstract final class AppPermission {
   static const String returnsProcess = 'sales.returns.process';
   static const String salesVoid = 'sales.void';
   static const String shiftsManage = 'shifts.manage';
+  static const String restaurantManage = 'restaurant.manage';
+  static const String kitchenView = 'kitchen.view';
 
   static const List<String> all = [
     dashboardView,
@@ -38,6 +40,8 @@ abstract final class AppPermission {
     returnsProcess,
     salesVoid,
     shiftsManage,
+    restaurantManage,
+    kitchenView,
   ];
 
   /// Only the owner should grant or use these (Users, Settings, Recycle Bin).
@@ -64,6 +68,8 @@ abstract final class AppPermission {
     returnsProcess,
     salesVoid,
     shiftsManage,
+    restaurantManage,
+    kitchenView,
   ];
 
   /// Shown as editable checkboxes in the user editor.
@@ -138,12 +144,15 @@ abstract final class AppRoles {
         AppPermission.returnsProcess,
         AppPermission.salesVoid,
         AppPermission.shiftsManage,
+        AppPermission.restaurantManage,
+        AppPermission.kitchenView,
       ],
       cashier => [
         AppPermission.dashboardView,
         AppPermission.posAccess,
         AppPermission.salesView,
         AppPermission.customersManage,
+        AppPermission.kitchenView,
       ],
       _ => const [],
     };

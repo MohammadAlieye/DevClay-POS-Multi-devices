@@ -236,7 +236,8 @@ class _SettingsLoadedViewState extends State<_SettingsLoadedView> {
       receiptTerms: _receiptTerms.text,
       receiptCounterName: _receiptCounterName.text,
       receiptSystemName: _receiptSystemName.text,
-      fbrInvoiceEnabled: _fbrInvoiceEnabled,
+      // FBR POS API is not integrated — never persist a live invoice flag.
+      fbrInvoiceEnabled: false,
       printerName: _printerName.text,
       autoPrintReceipt: _autoPrintReceipt,
       paperWidthMm: _paperWidthMm,
@@ -903,17 +904,18 @@ class _ReceiptTaxSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         const SectionHeader(
           title: 'FBR invoice',
-          subtitle: 'Enable when FBR POS integration is ready',
+          subtitle: 'Not connected — FBR POS API is not integrated yet',
         ),
         const SizedBox(height: AppSpacing.sm),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('Enable FBR invoice block'),
+          title: const Text('Enable FBR invoice block (preview only)'),
           subtitle: const Text(
-            'Shows FBR POS fee and verification text. Keep off until FBR is connected.',
+            'Unavailable until FBR is connected. Toggle is locked so shops '
+            'do not show fake FBR verification on receipts.',
           ),
-          value: fbrInvoiceEnabled,
-          onChanged: onFbrInvoiceEnabledChanged,
+          value: false,
+          onChanged: null,
         ),
         const SizedBox(height: AppSpacing.lg),
         const SectionHeader(
@@ -1137,6 +1139,8 @@ class _DevicesSectionState extends State<_DevicesSection> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const LanMultiDeviceSettingsCard(),
+        const SizedBox(height: AppSpacing.lg),
+        const WebToTableSettingsCard(),
         const SizedBox(height: AppSpacing.xl),
         SectionHeader(
           title: 'Devices',
@@ -2298,7 +2302,10 @@ class _BackupSection extends StatelessWidget {
       children: [
         const SectionHeader(
           title: 'Local backup',
-          subtitle: 'Export or import the offline database file',
+          subtitle:
+              'Export or import the offline database file. Auto-backup also '
+              'runs on launch when the last backup is older than 7 days '
+              '(saved under Documents/backups).',
         ),
         const SizedBox(height: AppSpacing.md),
         AppCard(

@@ -57,160 +57,190 @@ const AppSettingSchema = CollectionSchema(
       name: r'cashierShiftRequired',
       type: IsarType.bool,
     ),
-    r'defaultTaxInclusive': PropertySchema(
+    r'defaultCoverCharge': PropertySchema(
       id: 8,
+      name: r'defaultCoverCharge',
+      type: IsarType.double,
+    ),
+    r'defaultServiceChargePct': PropertySchema(
+      id: 9,
+      name: r'defaultServiceChargePct',
+      type: IsarType.double,
+    ),
+    r'defaultTaxInclusive': PropertySchema(
+      id: 10,
       name: r'defaultTaxInclusive',
       type: IsarType.bool,
     ),
     r'defaultTaxRate': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'defaultTaxRate',
       type: IsarType.double,
     ),
     r'enableBatchesExpiry': PropertySchema(
-      id: 10,
+      id: 12,
       name: r'enableBatchesExpiry',
       type: IsarType.bool,
     ),
     r'enableProductVariants': PropertySchema(
-      id: 11,
+      id: 13,
       name: r'enableProductVariants',
       type: IsarType.bool,
     ),
+    r'enableRestaurantFloor': PropertySchema(
+      id: 14,
+      name: r'enableRestaurantFloor',
+      type: IsarType.bool,
+    ),
     r'enableVariableMeasureSales': PropertySchema(
-      id: 12,
+      id: 15,
       name: r'enableVariableMeasureSales',
       type: IsarType.bool,
     ),
+    r'enableWebToTable': PropertySchema(
+      id: 16,
+      name: r'enableWebToTable',
+      type: IsarType.bool,
+    ),
     r'fbrInvoiceEnabled': PropertySchema(
-      id: 13,
+      id: 17,
       name: r'fbrInvoiceEnabled',
       type: IsarType.bool,
     ),
-    r'key': PropertySchema(id: 14, name: r'key', type: IsarType.string),
+    r'key': PropertySchema(id: 18, name: r'key', type: IsarType.string),
     r'lastBackupAt': PropertySchema(
-      id: 15,
+      id: 19,
       name: r'lastBackupAt',
       type: IsarType.dateTime,
     ),
     r'lastBackupPath': PropertySchema(
-      id: 16,
+      id: 20,
       name: r'lastBackupPath',
       type: IsarType.string,
     ),
     r'paperWidthMm': PropertySchema(
-      id: 17,
+      id: 21,
       name: r'paperWidthMm',
       type: IsarType.long,
     ),
     r'preferVolumeUnits': PropertySchema(
-      id: 18,
+      id: 22,
       name: r'preferVolumeUnits',
       type: IsarType.bool,
     ),
     r'preferredLabelStoreType': PropertySchema(
-      id: 19,
+      id: 23,
       name: r'preferredLabelStoreType',
       type: IsarType.string,
     ),
     r'primaryPreset': PropertySchema(
-      id: 20,
+      id: 24,
       name: r'primaryPreset',
       type: IsarType.string,
     ),
     r'printerName': PropertySchema(
-      id: 21,
+      id: 25,
       name: r'printerName',
       type: IsarType.string,
     ),
     r'productCategoriesCsv': PropertySchema(
-      id: 22,
+      id: 26,
       name: r'productCategoriesCsv',
       type: IsarType.string,
     ),
     r'productUnitsCsv': PropertySchema(
-      id: 23,
+      id: 27,
       name: r'productUnitsCsv',
       type: IsarType.string,
     ),
     r'receiptContentWidthMm': PropertySchema(
-      id: 24,
+      id: 28,
       name: r'receiptContentWidthMm',
       type: IsarType.long,
     ),
     r'receiptCounterName': PropertySchema(
-      id: 25,
+      id: 29,
       name: r'receiptCounterName',
       type: IsarType.string,
     ),
     r'receiptFooter': PropertySchema(
-      id: 26,
+      id: 30,
       name: r'receiptFooter',
       type: IsarType.string,
     ),
     r'receiptLogoPath': PropertySchema(
-      id: 27,
+      id: 31,
       name: r'receiptLogoPath',
       type: IsarType.string,
     ),
     r'receiptPrintAlign': PropertySchema(
-      id: 28,
+      id: 32,
       name: r'receiptPrintAlign',
       type: IsarType.string,
     ),
     r'receiptSystemName': PropertySchema(
-      id: 29,
+      id: 33,
       name: r'receiptSystemName',
       type: IsarType.string,
     ),
     r'receiptTerms': PropertySchema(
-      id: 30,
+      id: 34,
       name: r'receiptTerms',
       type: IsarType.string,
     ),
     r'receiptTitle': PropertySchema(
-      id: 31,
+      id: 35,
       name: r'receiptTitle',
       type: IsarType.string,
     ),
     r'seedRevision': PropertySchema(
-      id: 32,
+      id: 36,
       name: r'seedRevision',
       type: IsarType.string,
     ),
     r'showBusinessInfoOnReceipt': PropertySchema(
-      id: 33,
+      id: 37,
       name: r'showBusinessInfoOnReceipt',
       type: IsarType.bool,
     ),
     r'stockBaseUnitsMigrated': PropertySchema(
-      id: 34,
+      id: 38,
       name: r'stockBaseUnitsMigrated',
       type: IsarType.bool,
     ),
     r'storeProfile': PropertySchema(
-      id: 35,
+      id: 39,
       name: r'storeProfile',
       type: IsarType.string,
     ),
     r'storeProfileConfigured': PropertySchema(
-      id: 36,
+      id: 40,
       name: r'storeProfileConfigured',
       type: IsarType.bool,
     ),
     r'taxEnabled': PropertySchema(
-      id: 37,
+      id: 41,
       name: r'taxEnabled',
       type: IsarType.bool,
     ),
     r'taxNumber': PropertySchema(
-      id: 38,
+      id: 42,
       name: r'taxNumber',
       type: IsarType.string,
     ),
     r'themeMode': PropertySchema(
-      id: 39,
+      id: 43,
       name: r'themeMode',
+      type: IsarType.string,
+    ),
+    r'webToTablePin': PropertySchema(
+      id: 44,
+      name: r'webToTablePin',
+      type: IsarType.string,
+    ),
+    r'webToTableTokenSecret': PropertySchema(
+      id: 45,
+      name: r'webToTableTokenSecret',
       type: IsarType.string,
     ),
   },
@@ -283,6 +313,8 @@ int _appSettingEstimateSize(
   bytesCount += 3 + object.storeProfile.length * 3;
   bytesCount += 3 + object.taxNumber.length * 3;
   bytesCount += 3 + object.themeMode.length * 3;
+  bytesCount += 3 + object.webToTablePin.length * 3;
+  bytesCount += 3 + object.webToTableTokenSecret.length * 3;
   return bytesCount;
 }
 
@@ -300,38 +332,44 @@ void _appSettingSerialize(
   writer.writeString(offsets[5], object.businessName);
   writer.writeString(offsets[6], object.businessPhone);
   writer.writeBool(offsets[7], object.cashierShiftRequired);
-  writer.writeBool(offsets[8], object.defaultTaxInclusive);
-  writer.writeDouble(offsets[9], object.defaultTaxRate);
-  writer.writeBool(offsets[10], object.enableBatchesExpiry);
-  writer.writeBool(offsets[11], object.enableProductVariants);
-  writer.writeBool(offsets[12], object.enableVariableMeasureSales);
-  writer.writeBool(offsets[13], object.fbrInvoiceEnabled);
-  writer.writeString(offsets[14], object.key);
-  writer.writeDateTime(offsets[15], object.lastBackupAt);
-  writer.writeString(offsets[16], object.lastBackupPath);
-  writer.writeLong(offsets[17], object.paperWidthMm);
-  writer.writeBool(offsets[18], object.preferVolumeUnits);
-  writer.writeString(offsets[19], object.preferredLabelStoreType);
-  writer.writeString(offsets[20], object.primaryPreset);
-  writer.writeString(offsets[21], object.printerName);
-  writer.writeString(offsets[22], object.productCategoriesCsv);
-  writer.writeString(offsets[23], object.productUnitsCsv);
-  writer.writeLong(offsets[24], object.receiptContentWidthMm);
-  writer.writeString(offsets[25], object.receiptCounterName);
-  writer.writeString(offsets[26], object.receiptFooter);
-  writer.writeString(offsets[27], object.receiptLogoPath);
-  writer.writeString(offsets[28], object.receiptPrintAlign);
-  writer.writeString(offsets[29], object.receiptSystemName);
-  writer.writeString(offsets[30], object.receiptTerms);
-  writer.writeString(offsets[31], object.receiptTitle);
-  writer.writeString(offsets[32], object.seedRevision);
-  writer.writeBool(offsets[33], object.showBusinessInfoOnReceipt);
-  writer.writeBool(offsets[34], object.stockBaseUnitsMigrated);
-  writer.writeString(offsets[35], object.storeProfile);
-  writer.writeBool(offsets[36], object.storeProfileConfigured);
-  writer.writeBool(offsets[37], object.taxEnabled);
-  writer.writeString(offsets[38], object.taxNumber);
-  writer.writeString(offsets[39], object.themeMode);
+  writer.writeDouble(offsets[8], object.defaultCoverCharge);
+  writer.writeDouble(offsets[9], object.defaultServiceChargePct);
+  writer.writeBool(offsets[10], object.defaultTaxInclusive);
+  writer.writeDouble(offsets[11], object.defaultTaxRate);
+  writer.writeBool(offsets[12], object.enableBatchesExpiry);
+  writer.writeBool(offsets[13], object.enableProductVariants);
+  writer.writeBool(offsets[14], object.enableRestaurantFloor);
+  writer.writeBool(offsets[15], object.enableVariableMeasureSales);
+  writer.writeBool(offsets[16], object.enableWebToTable);
+  writer.writeBool(offsets[17], object.fbrInvoiceEnabled);
+  writer.writeString(offsets[18], object.key);
+  writer.writeDateTime(offsets[19], object.lastBackupAt);
+  writer.writeString(offsets[20], object.lastBackupPath);
+  writer.writeLong(offsets[21], object.paperWidthMm);
+  writer.writeBool(offsets[22], object.preferVolumeUnits);
+  writer.writeString(offsets[23], object.preferredLabelStoreType);
+  writer.writeString(offsets[24], object.primaryPreset);
+  writer.writeString(offsets[25], object.printerName);
+  writer.writeString(offsets[26], object.productCategoriesCsv);
+  writer.writeString(offsets[27], object.productUnitsCsv);
+  writer.writeLong(offsets[28], object.receiptContentWidthMm);
+  writer.writeString(offsets[29], object.receiptCounterName);
+  writer.writeString(offsets[30], object.receiptFooter);
+  writer.writeString(offsets[31], object.receiptLogoPath);
+  writer.writeString(offsets[32], object.receiptPrintAlign);
+  writer.writeString(offsets[33], object.receiptSystemName);
+  writer.writeString(offsets[34], object.receiptTerms);
+  writer.writeString(offsets[35], object.receiptTitle);
+  writer.writeString(offsets[36], object.seedRevision);
+  writer.writeBool(offsets[37], object.showBusinessInfoOnReceipt);
+  writer.writeBool(offsets[38], object.stockBaseUnitsMigrated);
+  writer.writeString(offsets[39], object.storeProfile);
+  writer.writeBool(offsets[40], object.storeProfileConfigured);
+  writer.writeBool(offsets[41], object.taxEnabled);
+  writer.writeString(offsets[42], object.taxNumber);
+  writer.writeString(offsets[43], object.themeMode);
+  writer.writeString(offsets[44], object.webToTablePin);
+  writer.writeString(offsets[45], object.webToTableTokenSecret);
 }
 
 AppSetting _appSettingDeserialize(
@@ -349,39 +387,45 @@ AppSetting _appSettingDeserialize(
   object.businessName = reader.readString(offsets[5]);
   object.businessPhone = reader.readString(offsets[6]);
   object.cashierShiftRequired = reader.readBool(offsets[7]);
-  object.defaultTaxInclusive = reader.readBool(offsets[8]);
-  object.defaultTaxRate = reader.readDouble(offsets[9]);
-  object.enableBatchesExpiry = reader.readBool(offsets[10]);
-  object.enableProductVariants = reader.readBool(offsets[11]);
-  object.enableVariableMeasureSales = reader.readBool(offsets[12]);
-  object.fbrInvoiceEnabled = reader.readBool(offsets[13]);
+  object.defaultCoverCharge = reader.readDouble(offsets[8]);
+  object.defaultServiceChargePct = reader.readDouble(offsets[9]);
+  object.defaultTaxInclusive = reader.readBool(offsets[10]);
+  object.defaultTaxRate = reader.readDouble(offsets[11]);
+  object.enableBatchesExpiry = reader.readBool(offsets[12]);
+  object.enableProductVariants = reader.readBool(offsets[13]);
+  object.enableRestaurantFloor = reader.readBool(offsets[14]);
+  object.enableVariableMeasureSales = reader.readBool(offsets[15]);
+  object.enableWebToTable = reader.readBool(offsets[16]);
+  object.fbrInvoiceEnabled = reader.readBool(offsets[17]);
   object.id = id;
-  object.key = reader.readString(offsets[14]);
-  object.lastBackupAt = reader.readDateTimeOrNull(offsets[15]);
-  object.lastBackupPath = reader.readStringOrNull(offsets[16]);
-  object.paperWidthMm = reader.readLong(offsets[17]);
-  object.preferVolumeUnits = reader.readBool(offsets[18]);
-  object.preferredLabelStoreType = reader.readString(offsets[19]);
-  object.primaryPreset = reader.readString(offsets[20]);
-  object.printerName = reader.readString(offsets[21]);
-  object.productCategoriesCsv = reader.readString(offsets[22]);
-  object.productUnitsCsv = reader.readString(offsets[23]);
-  object.receiptContentWidthMm = reader.readLong(offsets[24]);
-  object.receiptCounterName = reader.readString(offsets[25]);
-  object.receiptFooter = reader.readString(offsets[26]);
-  object.receiptLogoPath = reader.readStringOrNull(offsets[27]);
-  object.receiptPrintAlign = reader.readString(offsets[28]);
-  object.receiptSystemName = reader.readString(offsets[29]);
-  object.receiptTerms = reader.readString(offsets[30]);
-  object.receiptTitle = reader.readString(offsets[31]);
-  object.seedRevision = reader.readString(offsets[32]);
-  object.showBusinessInfoOnReceipt = reader.readBool(offsets[33]);
-  object.stockBaseUnitsMigrated = reader.readBool(offsets[34]);
-  object.storeProfile = reader.readString(offsets[35]);
-  object.storeProfileConfigured = reader.readBool(offsets[36]);
-  object.taxEnabled = reader.readBool(offsets[37]);
-  object.taxNumber = reader.readString(offsets[38]);
-  object.themeMode = reader.readString(offsets[39]);
+  object.key = reader.readString(offsets[18]);
+  object.lastBackupAt = reader.readDateTimeOrNull(offsets[19]);
+  object.lastBackupPath = reader.readStringOrNull(offsets[20]);
+  object.paperWidthMm = reader.readLong(offsets[21]);
+  object.preferVolumeUnits = reader.readBool(offsets[22]);
+  object.preferredLabelStoreType = reader.readString(offsets[23]);
+  object.primaryPreset = reader.readString(offsets[24]);
+  object.printerName = reader.readString(offsets[25]);
+  object.productCategoriesCsv = reader.readString(offsets[26]);
+  object.productUnitsCsv = reader.readString(offsets[27]);
+  object.receiptContentWidthMm = reader.readLong(offsets[28]);
+  object.receiptCounterName = reader.readString(offsets[29]);
+  object.receiptFooter = reader.readString(offsets[30]);
+  object.receiptLogoPath = reader.readStringOrNull(offsets[31]);
+  object.receiptPrintAlign = reader.readString(offsets[32]);
+  object.receiptSystemName = reader.readString(offsets[33]);
+  object.receiptTerms = reader.readString(offsets[34]);
+  object.receiptTitle = reader.readString(offsets[35]);
+  object.seedRevision = reader.readString(offsets[36]);
+  object.showBusinessInfoOnReceipt = reader.readBool(offsets[37]);
+  object.stockBaseUnitsMigrated = reader.readBool(offsets[38]);
+  object.storeProfile = reader.readString(offsets[39]);
+  object.storeProfileConfigured = reader.readBool(offsets[40]);
+  object.taxEnabled = reader.readBool(offsets[41]);
+  object.taxNumber = reader.readString(offsets[42]);
+  object.themeMode = reader.readString(offsets[43]);
+  object.webToTablePin = reader.readString(offsets[44]);
+  object.webToTableTokenSecret = reader.readString(offsets[45]);
   return object;
 }
 
@@ -409,68 +453,80 @@ P _appSettingDeserializeProp<P>(
     case 7:
       return (reader.readBool(offset)) as P;
     case 8:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 9:
       return (reader.readDouble(offset)) as P;
     case 10:
       return (reader.readBool(offset)) as P;
     case 11:
-      return (reader.readBool(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 12:
       return (reader.readBool(offset)) as P;
     case 13:
       return (reader.readBool(offset)) as P;
     case 14:
-      return (reader.readString(offset)) as P;
-    case 15:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 16:
-      return (reader.readStringOrNull(offset)) as P;
-    case 17:
-      return (reader.readLong(offset)) as P;
-    case 18:
       return (reader.readBool(offset)) as P;
+    case 15:
+      return (reader.readBool(offset)) as P;
+    case 16:
+      return (reader.readBool(offset)) as P;
+    case 17:
+      return (reader.readBool(offset)) as P;
+    case 18:
+      return (reader.readString(offset)) as P;
     case 19:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 20:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 21:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 22:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 23:
       return (reader.readString(offset)) as P;
     case 24:
-      return (reader.readLong(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 25:
       return (reader.readString(offset)) as P;
     case 26:
       return (reader.readString(offset)) as P;
     case 27:
-      return (reader.readStringOrNull(offset)) as P;
-    case 28:
       return (reader.readString(offset)) as P;
+    case 28:
+      return (reader.readLong(offset)) as P;
     case 29:
       return (reader.readString(offset)) as P;
     case 30:
       return (reader.readString(offset)) as P;
     case 31:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 32:
       return (reader.readString(offset)) as P;
     case 33:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 34:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 35:
       return (reader.readString(offset)) as P;
     case 36:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 37:
       return (reader.readBool(offset)) as P;
     case 38:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 39:
+      return (reader.readString(offset)) as P;
+    case 40:
+      return (reader.readBool(offset)) as P;
+    case 41:
+      return (reader.readBool(offset)) as P;
+    case 42:
+      return (reader.readString(offset)) as P;
+    case 43:
+      return (reader.readString(offset)) as P;
+    case 44:
+      return (reader.readString(offset)) as P;
+    case 45:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1418,6 +1474,159 @@ extension AppSettingQueryFilter
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultCoverChargeEqualTo(double value, {double epsilon = Query.epsilon}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'defaultCoverCharge',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultCoverChargeGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'defaultCoverCharge',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultCoverChargeLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'defaultCoverCharge',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultCoverChargeBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'defaultCoverCharge',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultServiceChargePctEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'defaultServiceChargePct',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultServiceChargePctGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'defaultServiceChargePct',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultServiceChargePctLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'defaultServiceChargePct',
+          value: value,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  defaultServiceChargePctBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'defaultServiceChargePct',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+
+          epsilon: epsilon,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
   defaultTaxInclusiveEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1523,6 +1732,18 @@ extension AppSettingQueryFilter
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  enableRestaurantFloorEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'enableRestaurantFloor',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
   enableVariableMeasureSalesEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1530,6 +1751,15 @@ extension AppSettingQueryFilter
           property: r'enableVariableMeasureSales',
           value: value,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  enableWebToTableEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'enableWebToTable', value: value),
       );
     });
   }
@@ -4442,6 +4672,291 @@ extension AppSettingQueryFilter
       );
     });
   }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'webToTablePin',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'webToTablePin',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'webToTablePin',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'webToTablePin',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'webToTablePin',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'webToTablePin',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'webToTablePin',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'webToTablePin',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'webToTablePin', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTablePinIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'webToTablePin', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'webToTableTokenSecret',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'webToTableTokenSecret',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'webToTableTokenSecret',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'webToTableTokenSecret',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'webToTableTokenSecret',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'webToTableTokenSecret',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'webToTableTokenSecret',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'webToTableTokenSecret',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'webToTableTokenSecret', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  webToTableTokenSecretIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          property: r'webToTableTokenSecret',
+          value: '',
+        ),
+      );
+    });
+  }
 }
 
 extension AppSettingQueryObject
@@ -4555,6 +5070,34 @@ extension AppSettingQuerySortBy
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByDefaultCoverCharge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultCoverCharge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByDefaultCoverChargeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultCoverCharge', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByDefaultServiceChargePct() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultServiceChargePct', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByDefaultServiceChargePctDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultServiceChargePct', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
   sortByDefaultTaxInclusive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'defaultTaxInclusive', Sort.asc);
@@ -4610,6 +5153,20 @@ extension AppSettingQuerySortBy
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableRestaurantFloor() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableRestaurantFloor', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableRestaurantFloorDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableRestaurantFloor', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
   sortByEnableVariableMeasureSales() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enableVariableMeasureSales', Sort.asc);
@@ -4620,6 +5177,19 @@ extension AppSettingQuerySortBy
   sortByEnableVariableMeasureSalesDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enableVariableMeasureSales', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByEnableWebToTable() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableWebToTable', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableWebToTableDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableWebToTable', Sort.desc);
     });
   }
 
@@ -4967,6 +5537,32 @@ extension AppSettingQuerySortBy
       return query.addSortBy(r'themeMode', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByWebToTablePin() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTablePin', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByWebToTablePinDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTablePin', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByWebToTableTokenSecret() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTableTokenSecret', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByWebToTableTokenSecretDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTableTokenSecret', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingQuerySortThenBy
@@ -5074,6 +5670,34 @@ extension AppSettingQuerySortThenBy
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByDefaultCoverCharge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultCoverCharge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByDefaultCoverChargeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultCoverCharge', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByDefaultServiceChargePct() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultServiceChargePct', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByDefaultServiceChargePctDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'defaultServiceChargePct', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
   thenByDefaultTaxInclusive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'defaultTaxInclusive', Sort.asc);
@@ -5129,6 +5753,20 @@ extension AppSettingQuerySortThenBy
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableRestaurantFloor() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableRestaurantFloor', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableRestaurantFloorDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableRestaurantFloor', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
   thenByEnableVariableMeasureSales() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enableVariableMeasureSales', Sort.asc);
@@ -5139,6 +5777,19 @@ extension AppSettingQuerySortThenBy
   thenByEnableVariableMeasureSalesDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'enableVariableMeasureSales', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByEnableWebToTable() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableWebToTable', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableWebToTableDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableWebToTable', Sort.desc);
     });
   }
 
@@ -5498,6 +6149,32 @@ extension AppSettingQuerySortThenBy
       return query.addSortBy(r'themeMode', Sort.desc);
     });
   }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByWebToTablePin() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTablePin', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByWebToTablePinDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTablePin', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByWebToTableTokenSecret() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTableTokenSecret', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByWebToTableTokenSecretDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'webToTableTokenSecret', Sort.desc);
+    });
+  }
 }
 
 extension AppSettingQueryWhereDistinct
@@ -5572,6 +6249,20 @@ extension AppSettingQueryWhereDistinct
   }
 
   QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByDefaultCoverCharge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'defaultCoverCharge');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByDefaultServiceChargePct() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'defaultServiceChargePct');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
   distinctByDefaultTaxInclusive() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'defaultTaxInclusive');
@@ -5599,9 +6290,22 @@ extension AppSettingQueryWhereDistinct
   }
 
   QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByEnableRestaurantFloor() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableRestaurantFloor');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
   distinctByEnableVariableMeasureSales() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'enableVariableMeasureSales');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct> distinctByEnableWebToTable() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableWebToTable');
     });
   }
 
@@ -5836,6 +6540,27 @@ extension AppSettingQueryWhereDistinct
       return query.addDistinctBy(r'themeMode', caseSensitive: caseSensitive);
     });
   }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct> distinctByWebToTablePin({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'webToTablePin',
+        caseSensitive: caseSensitive,
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByWebToTableTokenSecret({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'webToTableTokenSecret',
+        caseSensitive: caseSensitive,
+      );
+    });
+  }
 }
 
 extension AppSettingQueryProperty
@@ -5896,6 +6621,20 @@ extension AppSettingQueryProperty
     });
   }
 
+  QueryBuilder<AppSetting, double, QQueryOperations>
+  defaultCoverChargeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'defaultCoverCharge');
+    });
+  }
+
+  QueryBuilder<AppSetting, double, QQueryOperations>
+  defaultServiceChargePctProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'defaultServiceChargePct');
+    });
+  }
+
   QueryBuilder<AppSetting, bool, QQueryOperations>
   defaultTaxInclusiveProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -5924,9 +6663,22 @@ extension AppSettingQueryProperty
   }
 
   QueryBuilder<AppSetting, bool, QQueryOperations>
+  enableRestaurantFloorProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableRestaurantFloor');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations>
   enableVariableMeasureSalesProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'enableVariableMeasureSales');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations> enableWebToTableProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableWebToTable');
     });
   }
 
@@ -6099,6 +6851,19 @@ extension AppSettingQueryProperty
   QueryBuilder<AppSetting, String, QQueryOperations> themeModeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'themeMode');
+    });
+  }
+
+  QueryBuilder<AppSetting, String, QQueryOperations> webToTablePinProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'webToTablePin');
+    });
+  }
+
+  QueryBuilder<AppSetting, String, QQueryOperations>
+  webToTableTokenSecretProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'webToTableTokenSecret');
     });
   }
 }

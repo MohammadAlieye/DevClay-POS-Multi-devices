@@ -1,12 +1,16 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:isar_community/isar.dart';
 
 import '../../../../utils/user_facing_error.dart';
 import '../../../../utils/measure_units.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../database/collections/sale.dart';
+import '../../../../database/isar_service.dart';
 import '../../../../services/feedback/app_sound_service.dart';
 import '../../../notifications/presentation/cubit/notifications_cubit.dart';
+import '../../../restaurant/data/datasources/restaurant_local_datasource.dart';
 import '../../domain/entities/pos_entities.dart';
 import '../../domain/repositories/pos_repository.dart';
 import '../utils/pos_ui_prefs.dart';
@@ -44,6 +48,7 @@ class PosBloc extends Bloc<PosEvent, PosState> {
     on<PosClearCart>(_onClear);
     on<PosDismissMessage>(_onDismiss);
     on<PosCatalogRefreshRequested>(_onCatalogRefresh);
+    on<PosWholesaleModeToggled>(_onWholesaleModeToggled);
   }
 
   final PosRepository _repository;
@@ -215,6 +220,9 @@ class PosBloc extends Bloc<PosEvent, PosState> {
             : existing.quantityLabel,
       );
     } else {
+      final wholesalePrice = current.wholesaleMode && product.wholesalePrice > 0
+          ? product.wholesalePrice
+          : null;
       lines.add(
         CartLine(
           product: product,
@@ -228,6 +236,7 @@ class PosBloc extends Bloc<PosEvent, PosState> {
                 )
               : null,
           selectedBatch: batch,
+          overrideUnitPrice: wholesalePrice,
         ),
       );
     }
@@ -848,6 +857,7 @@ class PosBloc extends Bloc<PosEvent, PosState> {
         cashAccountId: event.cashAccountId,
         bankAccountId: event.bankAccountId,
       );
+      await _closeRestaurantCheckIfLinked(current.notes, sale);
       final products = await _repository.getProducts();
       final customers = await _repository.getCustomers();
       emit(
@@ -870,6 +880,30 @@ class PosBloc extends Bloc<PosEvent, PosState> {
         current.copyWith(message: userFacingError(error), checkoutOpen: false),
       );
     }
+  }
+
+  Future<void> _closeRestaurantCheckIfLinked(
+    String? notes,
+    CompletedSale sale,
+  ) async {
+    final raw = notes ?? '';
+    final match = RegExp(r'RSTCHECK:(\d+)').firstMatch(raw);
+    if (match == null) return;
+    final checkId = int.tryParse(match.group(1)!);
+    if (checkId == null) return;
+    try {
+      if (!sl.isRegistered<RestaurantLocalDataSource>()) return;
+      final isar = sl<IsarService>().instance;
+      final saleRow = await isar.sales
+          .filter()
+          .invoiceNoEqualTo(sale.invoiceNo)
+          .findFirst();
+      await sl<RestaurantLocalDataSource>().closeCheck(
+        checkId: checkId,
+        saleId: saleRow?.id ?? 0,
+        invoiceNo: sale.invoiceNo,
+      );
+    } catch (_) {}
   }
 
   void _onClear(PosClearCart event, Emitter<PosState> emit) {
@@ -914,5 +948,21 @@ class PosBloc extends Bloc<PosEvent, PosState> {
     } catch (error) {
       emit(current.copyWith(message: userFacingError(error)));
     }
+  }
+
+  void _onWholesaleModeToggled(
+    PosWholesaleModeToggled event,
+    Emitter<PosState> emit,
+  ) {
+    final current = state;
+    if (current is! PosReady) return;
+    emit(
+      current.copyWith(
+        wholesaleMode: event.enabled,
+        message: event.enabled
+            ? 'Wholesale pricing on — new lines use wholesale price when set.'
+            : 'Retail pricing on',
+      ),
+    );
   }
 }

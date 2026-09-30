@@ -130,13 +130,11 @@ void main() {
       expect(res.statusCode, 404);
     });
 
-    test('documented gap: inactive product is still fetchable by id', () async {
+    test('returns 404 for inactive product by id', () async {
       final res = await h.get(
         '${LanApiPaths.productById}${h.fixtures.inactiveProductId}',
       );
-      expect(res.statusCode, 200);
-      final body = jsonDecode(res.body) as Map<String, dynamic>;
-      expect(body['isActive'], isFalse);
+      expect(res.statusCode, 404);
     });
   });
 

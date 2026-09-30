@@ -144,7 +144,31 @@ class SalesLocalDataSource {
 
   Future<SaleReturnResult> processReturn(SaleReturnRequest request) async {
     if (sl<LanModeService>().isClient) {
-      throw StateError('Returns must be processed on the shop host PC.');
+      final online = await sl<LanConnectionMonitor>().refresh();
+      if (!online) {
+        throw StateError('Shop host offline — cannot process return.');
+      }
+      final result = await sl<LanApiClient>().processSaleReturn(
+        saleId: request.saleId,
+        payload: {
+          'reason': request.reason,
+          'isVoid': request.isVoid,
+          'approvedById': request.approvedById,
+          'approvedByName': request.approvedByName,
+          'lines': [
+            for (final line in request.lines)
+              {
+                'productId': line.productId,
+                'quantity': line.quantity,
+              },
+          ],
+        },
+      );
+      return SaleReturnResult(
+        returnNo: '${result['returnNo']}',
+        refundAmount: (result['refundAmount'] as num?)?.toDouble() ?? 0,
+        status: '${result['status'] ?? 'returned'}',
+      );
     }
     if (request.lines.isEmpty) throw ArgumentError('Select items to return.');
     if (request.reason.trim().isEmpty) {

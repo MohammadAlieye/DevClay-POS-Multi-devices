@@ -5,6 +5,8 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../modules/notifications/presentation/cubit/notifications_cubit.dart';
+import '../../../../modules/restaurant/data/datasources/restaurant_local_datasource.dart';
+import '../../../../modules/restaurant/presentation/widgets/pos_tables_panel.dart';
 import '../../../../themes/app_colors.dart';
 import '../../../../themes/app_shadows.dart';
 import '../../../../themes/app_spacing.dart';
@@ -130,6 +132,9 @@ class _PosReadyViewState extends State<_PosReadyView> {
   bool _metaExpanded = PosUiPrefs.instance.metaExpanded;
   double _cartWidthFraction = PosUiPrefs.instance.cartWidthFraction;
   PosProductLayout _productLayout = PosProductLayout.grid;
+  bool _restaurantEnabled = false;
+  bool _tablesMode = false;
+  int? _activeCheckId;
 
   @override
   void initState() {
@@ -167,6 +172,15 @@ class _PosReadyViewState extends State<_PosReadyView> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _ensureScanFocus());
     _scheduleMessageDismiss(widget.state.message);
     _loadUiPrefs();
+    _loadRestaurantFlag();
+  }
+
+  Future<void> _loadRestaurantFlag() async {
+    try {
+      final enabled = await sl<RestaurantLocalDataSource>().isRestaurantEnabled();
+      if (!mounted) return;
+      setState(() => _restaurantEnabled = enabled);
+    } catch (_) {}
   }
 
   Future<void> _loadUiPrefs() async {
@@ -414,12 +428,80 @@ class _PosReadyViewState extends State<_PosReadyView> {
     final categories = ['All', ...state.categories];
     final isDark = theme.brightness == Brightness.dark;
 
-    return _buildPosLayout(
-      context: context,
-      state: state,
-      theme: theme,
-      categories: categories,
-      isDark: isDark,
+    final body = _tablesMode && _restaurantEnabled
+        ? PosTablesPanel(
+            onOpenCheck: (check, table) {
+              setState(() {
+                _tablesMode = false;
+                _activeCheckId = check.id;
+              });
+              context.read<PosBloc>().add(
+                    PosNotesChanged('RSTCHECK:${check.id}|${table.code}'),
+                  );
+              AppToast.show(
+                context,
+                'Ordering for ${table.code} · check #${check.id}',
+              );
+            },
+          )
+        : _buildPosLayout(
+            context: context,
+            state: state,
+            theme: theme,
+            categories: categories,
+            isDark: isDark,
+          );
+
+    if (!_restaurantEnabled) return body;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.sm,
+            AppSpacing.sm,
+            AppSpacing.sm,
+            0,
+          ),
+          child: Row(
+            children: [
+              SegmentedButton<bool>(
+                segments: const [
+                  ButtonSegment(value: false, label: Text('Quick Sale')),
+                  ButtonSegment(value: true, label: Text('Tables')),
+                ],
+                selected: {_tablesMode},
+                onSelectionChanged: (set) {
+                  setState(() => _tablesMode = set.first);
+                },
+              ),
+              if (_activeCheckId != null) ...[
+                const SizedBox(width: 12),
+                Chip(
+                  label: Text('Check #$_activeCheckId'),
+                  onDeleted: () {
+                    setState(() => _activeCheckId = null);
+                    context.read<PosBloc>().add(const PosNotesChanged(''));
+                  },
+                ),
+                TextButton(
+                  onPressed: () async {
+                    final id = _activeCheckId;
+                    if (id == null) return;
+                    await sl<RestaurantLocalDataSource>()
+                        .fireKitchenTicket(checkId: id);
+                    if (context.mounted) {
+                      AppToast.show(context, 'Sent to kitchen');
+                    }
+                  },
+                  child: const Text('Send kitchen'),
+                ),
+              ],
+            ],
+          ),
+        ),
+        Expanded(child: body),
+      ],
     );
   }
 

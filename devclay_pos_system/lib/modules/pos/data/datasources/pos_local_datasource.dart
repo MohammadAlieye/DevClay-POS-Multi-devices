@@ -19,6 +19,7 @@ import '../../../../core/di/injection.dart';
 import '../../../../core/lan_api/client/lan_api_client.dart';
 import '../../../../core/lan_api/client/lan_connection_monitor.dart';
 import '../../../../core/lan_api/dtos/lan_dtos.dart';
+import '../../../../core/lan_api/host/sale_write_service.dart';
 import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/isar_service.dart';
 import '../../../../database/product_batch_store.dart';
@@ -263,7 +264,20 @@ class PosLocalDataSource {
 
   Future<List<HeldSaleSummary>> getHeldSales() async {
     if (sl<LanModeService>().isClient) {
-      return const [];
+      final online = await sl<LanConnectionMonitor>().refresh();
+      if (!online) return const [];
+      final items = await sl<LanApiClient>().fetchHeldSales();
+      return [
+        for (final item in items)
+          HeldSaleSummary(
+            id: (item['id'] as num?)?.toInt() ?? 0,
+            holdCode: '${item['holdCode'] ?? ''}',
+            customerName: item['customerName'] as String?,
+            heldAt: DateTime.tryParse('${item['heldAt']}') ?? DateTime.now(),
+            itemCount: (item['itemCount'] as num?)?.toInt() ?? 0,
+            total: (item['total'] as num?)?.toDouble() ?? 0,
+          ),
+      ];
     }
     final products = {for (final p in await getProducts()) p.id: p};
     final held = await _isarService.instance.heldSales
@@ -297,7 +311,49 @@ class PosLocalDataSource {
     String? notes,
   }) async {
     if (sl<LanModeService>().isClient) {
-      throw StateError('Held sales are disabled on counter devices. Complete the sale on this till or cancel.');
+      final online = await sl<LanConnectionMonitor>().refresh();
+      if (!online) {
+        throw StateError('Shop host offline — cannot hold sale.');
+      }
+      final payload = lines
+          .map(
+            (line) => {
+              'productId': line.product.id,
+              'quantity': line.quantity,
+              'lineDiscount': line.lineDiscount,
+              'lineDiscountMode':
+                  line.lineDiscountMode == LineDiscountMode.percent
+                      ? 'percent'
+                      : 'fixed',
+              'lineDiscountAmount': line.discountAmount,
+              'sellingPrice': line.product.sellingPrice,
+              'lineTotal': line.lineTotal,
+              'isVariableSale': line.isVariableSale,
+              if (line.quantityLabel != null) 'quantityLabel': line.quantityLabel,
+              if (line.overrideLineTotal != null)
+                'overrideLineTotal': line.overrideLineTotal,
+              if (line.selectedBatch != null)
+                'selectedBatchId': line.selectedBatch!.id,
+            },
+          )
+          .toList();
+      final result = await sl<LanApiClient>().createHeldSale({
+        'itemsJson': jsonEncode(payload),
+        'discountAmount': cartDiscount,
+        'discountIsPercent': cartDiscountMode == CartDiscountMode.percent,
+        'customerId': customerId,
+        'customerName': customerName,
+        'notes': notes,
+      });
+      final totals = _computeTotals(lines, cartDiscount, cartDiscountMode);
+      return HeldSaleSummary(
+        id: (result['id'] as num?)?.toInt() ?? 0,
+        holdCode: '${result['holdCode'] ?? ''}',
+        customerName: customerName,
+        heldAt: DateTime.tryParse('${result['heldAt']}') ?? DateTime.now(),
+        itemCount: lines.length,
+        total: totals.total,
+      );
     }
     final isar = _isarService.instance;
     final code = 'H-${DateTime.now().millisecondsSinceEpoch % 100000}';
@@ -399,6 +455,40 @@ class PosLocalDataSource {
     })
   >
   resumeSale(int heldSaleId) async {
+    if (sl<LanModeService>().isClient) {
+      final online = await sl<LanConnectionMonitor>().refresh();
+      if (!online) {
+        throw StateError('Shop host offline — cannot resume held sale.');
+      }
+      final held = await sl<LanApiClient>().fetchHeldSale(heldSaleId);
+      if (held == null) {
+        throw StateError('Held sale not found on host.');
+      }
+      final products = {for (final p in await getProducts()) p.id: p};
+      final itemsJson = '${held['itemsJson'] ?? '[]'}';
+      final storedItems = jsonDecode(itemsJson) as List<dynamic>;
+      final lines = _decodeHeldLines(itemsJson, products);
+      if (lines.length != storedItems.length) {
+        throw StateError(
+          'Cannot resume ${held['holdCode']}: some products are unavailable.',
+        );
+      }
+      if (lines.isEmpty) {
+        throw StateError('Cannot resume: held bill has no valid items.');
+      }
+      await sl<LanApiClient>().deleteHeldSale(heldSaleId);
+      return (
+        lines: lines,
+        cartDiscount: (held['discountAmount'] as num?)?.toDouble() ?? 0,
+        cartDiscountMode: held['discountIsPercent'] != false
+            ? CartDiscountMode.percent
+            : CartDiscountMode.fixed,
+        customerName: held['customerName'] as String?,
+        customerId: (held['customerId'] as num?)?.toInt(),
+        notes: held['notes'] as String?,
+      );
+    }
+
     final isar = _isarService.instance;
     final held = await isar.heldSales.get(heldSaleId);
     if (held == null || held.deletedAt != null) {
@@ -442,6 +532,10 @@ class PosLocalDataSource {
   }
 
   Future<void> deleteHeldSale(int heldSaleId) async {
+    if (sl<LanModeService>().isClient) {
+      await sl<LanApiClient>().deleteHeldSale(heldSaleId);
+      return;
+    }
     final isar = _isarService.instance;
     final held = await isar.heldSales.get(heldSaleId);
     if (held == null) return;
@@ -493,7 +587,7 @@ class PosLocalDataSource {
 
     final isar = _isarService.instance;
     final totals = _computeTotals(lines, cartDiscount, cartDiscountMode);
-    final invoiceNo = 'INV-${DateTime.now().millisecondsSinceEpoch % 1000000}';
+    final invoiceNo = await sl<SaleWriteService>().allocateNextInvoiceNo();
     final now = DateTime.now();
     final actor = await RetailActorStore.current(isar);
 
@@ -533,6 +627,9 @@ class PosLocalDataSource {
         cashAccount != null ? 'Cash · ${cashAccount.name}' : 'Cash',
       PaymentMethodKind.card =>
         bankAccount != null ? bankAccount.name : 'Card / Bank',
+      PaymentMethodKind.wallet => bankAccount != null
+          ? 'JazzCash / Easypaisa · ${bankAccount.name}'
+          : 'JazzCash / Easypaisa',
       PaymentMethodKind.split => () {
         final cashPart = cashAccount?.name ?? 'Cash';
         final bankPart = bankAccount?.name ?? 'Card';
@@ -542,7 +639,8 @@ class PosLocalDataSource {
         amountPaid <= 0 ? 'Khata / Udhar' : 'Khata · Partial payment',
     };
 
-    final paid = method == PaymentMethodKind.card
+    final paid = method == PaymentMethodKind.card ||
+            method == PaymentMethodKind.wallet
         ? totals.total
         : method == PaymentMethodKind.split
         ? amountPaid + cardAmount
@@ -687,7 +785,9 @@ class PosLocalDataSource {
           now: now,
           actor: actor,
         );
-      } else if (method == PaymentMethodKind.card && bankAccount != null) {
+      } else if ((method == PaymentMethodKind.card ||
+              method == PaymentMethodKind.wallet) &&
+          bankAccount != null) {
         await _depositSale(
           isar: isar,
           account: bankAccount,
@@ -808,20 +908,28 @@ class PosLocalDataSource {
       throw StateError('Shop host offline — check Host PC and Wi‑Fi.');
     }
     final totals = _computeTotals(lines, cartDiscount, cartDiscountMode);
+    final cartDiscountValue = resolveCartDiscountAmount(
+      lines,
+      cartDiscount,
+      cartDiscountMode,
+    );
     final actor = await RetailActorStore.current(_isarService.instance);
     final methodLabel = switch (method) {
       PaymentMethodKind.cash => 'Cash',
       PaymentMethodKind.card => 'Card / Bank',
+      PaymentMethodKind.wallet => 'JazzCash / Easypaisa',
       PaymentMethodKind.split => 'Split',
       PaymentMethodKind.khata => 'Khata / Udhar',
     };
     final methodKind = switch (method) {
       PaymentMethodKind.cash => 'cash',
       PaymentMethodKind.card => 'card',
+      PaymentMethodKind.wallet => 'wallet',
       PaymentMethodKind.split => 'split',
       PaymentMethodKind.khata => 'khata',
     };
-    final paid = method == PaymentMethodKind.card
+    final paid = method == PaymentMethodKind.card ||
+            method == PaymentMethodKind.wallet
         ? totals.total
         : method == PaymentMethodKind.split
             ? amountPaid + cardAmount
@@ -836,6 +944,9 @@ class PosLocalDataSource {
           'quantity': line.quantity,
           'unitPrice': line.unitPrice,
           'lineTotal': line.lineTotal,
+          'lineDiscount': line.discountAmount,
+          if (line.quantityLabel != null) 'quantityLabel': line.quantityLabel,
+          if (line.selectedBatch != null) 'batchId': line.selectedBatch!.id,
         },
     ]);
     final result = await sl<LanApiClient>().createSale(
@@ -846,7 +957,7 @@ class PosLocalDataSource {
         subtotal: totals.subtotal,
         tax: totals.tax,
         total: totals.total,
-        discount: totals.discount,
+        discount: cartDiscountValue,
         paymentMethod: methodLabel,
         amountPaid: amountPaid,
         cardAmount: cardAmount,

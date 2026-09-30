@@ -42,6 +42,7 @@ final class PosReady extends PosState {
     this.checkoutOpen = false,
     this.message,
     this.lastSale,
+    this.wholesaleMode = false,
   });
 
   final List<PosProduct> allProducts;
@@ -60,6 +61,7 @@ final class PosReady extends PosState {
   final bool checkoutOpen;
   final String? message;
   final CompletedSale? lastSale;
+  final bool wholesaleMode;
 
   List<PosProduct> get visibleProducts {
     final q = query.trim().toLowerCase();
@@ -143,6 +145,7 @@ final class PosReady extends PosState {
     bool? checkoutOpen,
     String? message,
     CompletedSale? lastSale,
+    bool? wholesaleMode,
     bool clearCustomer = false,
     bool clearSelectedCustomer = false,
     bool clearNotes = false,
@@ -168,6 +171,7 @@ final class PosReady extends PosState {
       checkoutOpen: checkoutOpen ?? this.checkoutOpen,
       message: clearMessage ? null : (message ?? this.message),
       lastSale: clearLastSale ? null : (lastSale ?? this.lastSale),
+      wholesaleMode: wholesaleMode ?? this.wholesaleMode,
     );
   }
 
@@ -189,5 +193,6 @@ final class PosReady extends PosState {
     checkoutOpen,
     message,
     lastSale,
+    wholesaleMode,
   ];
 }

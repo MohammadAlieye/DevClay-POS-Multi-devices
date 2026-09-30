@@ -7,7 +7,8 @@ enum StoreProfileId {
   clothing,
   milk,
   superStore,
-  generalRetail;
+  generalRetail,
+  restaurant;
 
   String get storageKey => switch (this) {
         StoreProfileId.pharmacy => 'pharmacy',
@@ -15,6 +16,7 @@ enum StoreProfileId {
         StoreProfileId.milk => 'milk',
         StoreProfileId.superStore => 'super_store',
         StoreProfileId.generalRetail => 'general_retail',
+        StoreProfileId.restaurant => 'restaurant',
       };
 
   String get displayName => switch (this) {
@@ -23,6 +25,7 @@ enum StoreProfileId {
         StoreProfileId.milk => 'Milk shop',
         StoreProfileId.superStore => 'Super store',
         StoreProfileId.generalRetail => 'General retail',
+        StoreProfileId.restaurant => 'Restaurant',
       };
 
   String get description => switch (this) {
@@ -36,6 +39,8 @@ enum StoreProfileId {
           'Broad catalog covering grocery and more.',
         StoreProfileId.generalRetail =>
           'Standard retail defaults for general shops.',
+        StoreProfileId.restaurant =>
+          'Floor tables, dine-in checks, and LAN web-to-table ordering.',
       };
 
   static StoreProfileId fromStorage(String? raw) {
@@ -46,6 +51,7 @@ enum StoreProfileId {
       'milk' => StoreProfileId.milk,
       'super_store' || 'superstore' => StoreProfileId.superStore,
       'general_retail' || 'general' || 'retail' => StoreProfileId.generalRetail,
+      'restaurant' || 'cafe' || 'dining' => StoreProfileId.restaurant,
       _ => StoreProfileId.generalRetail,
     };
   }
@@ -124,6 +130,7 @@ abstract final class StoreProfiles {
         StoreProfileId.milk => _milk,
         StoreProfileId.superStore => _superStore,
         StoreProfileId.generalRetail => _generalRetail,
+        StoreProfileId.restaurant => _restaurant,
       };
 
   static final StoreProfileDefinition _pharmacy = StoreProfileDefinition(
@@ -216,6 +223,27 @@ abstract final class StoreProfiles {
     extraUnits: DefaultProductUnits.customDefaults,
     flags: const StoreProfileFlags(
       enableBatchesExpiry: true,
+      batchesExpiryRequired: false,
+      enableProductVariants: false,
+      enableVariableMeasureSales: true,
+      preferVolumeUnits: false,
+    ),
+    labelStoreType: LabelStoreType.retail,
+  );
+
+  static final StoreProfileDefinition _restaurant = StoreProfileDefinition(
+    id: StoreProfileId.restaurant,
+    categories: const [
+      'Starters',
+      'Mains',
+      'Drinks',
+      'Desserts',
+      'Combos',
+      'Other',
+    ],
+    extraUnits: const ['portion', 'plate', 'glass'],
+    flags: const StoreProfileFlags(
+      enableBatchesExpiry: false,
       batchesExpiryRequired: false,
       enableProductVariants: false,
       enableVariableMeasureSales: true,

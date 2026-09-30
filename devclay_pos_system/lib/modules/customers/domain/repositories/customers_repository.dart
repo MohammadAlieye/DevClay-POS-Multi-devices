@@ -3,7 +3,10 @@ import '../entities/customer_entities.dart';
 abstract class CustomersRepository {
   Future<List<CustomerItem>> getCustomers({String query = ''});
 
-  Future<List<CustomerSaleSummary>> getCustomerSales(String customerName);
+  Future<List<CustomerSaleSummary>> getCustomerSales(
+    String customerName, {
+    int? customerId,
+  });
 
   Future<List<CustomerKhataEntry>> getKhataLedger(int customerId);
 

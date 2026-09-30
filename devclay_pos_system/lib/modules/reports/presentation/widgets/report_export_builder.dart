@@ -144,13 +144,66 @@ Future<ReportExportPayload> buildReportExportPayload({
       }
 
     default:
-      summaryRows.add(('Records', '${rows.length}'));
-      columns.add(
-        ReportExportColumn('Item', (r) => r['label'] as String? ?? ''),
-      );
-      columns.add(
-        ReportExportColumn('Value', (r) => r['value'] as String? ?? ''),
-      );
+      final m = payload.summary;
+      summaryRows.addAll([
+        ('Total sales', ReportExportService.formatCurrency(m.totalSales)),
+        ('Receipts', '${m.totalReceipts}'),
+        ('Est. profit', ReportExportService.formatCurrency(m.estimatedProfit)),
+        ('Purchases', ReportExportService.formatCurrency(m.totalPurchases)),
+        ('Expenses', ReportExportService.formatCurrency(m.totalExpenses)),
+        ('Stock value', ReportExportService.formatCurrency(m.stockValue)),
+      ]);
+      if (payload.topProducts.isNotEmpty) {
+        columns.addAll([
+          ReportExportColumn('Product', (r) => r['name'] as String),
+          ReportExportColumn('SKU', (r) => r['sku'] as String),
+          ReportExportColumn('Units', (r) => '${r['units']}'),
+          ReportExportColumn(
+            'Revenue',
+            (r) => ReportExportService.formatCurrency(r['revenue'] as num),
+          ),
+        ]);
+        for (final p in payload.topProducts) {
+          rows.add({
+            'name': p.name,
+            'sku': p.sku,
+            'units': p.unitsSold,
+            'revenue': p.revenue,
+          });
+        }
+      } else if (payload.expenseCategories.isNotEmpty) {
+        columns.addAll([
+          ReportExportColumn('Category', (r) => r['category'] as String),
+          ReportExportColumn(
+            'Amount',
+            (r) => ReportExportService.formatCurrency(r['amount'] as num),
+          ),
+        ]);
+        for (final c in payload.expenseCategories) {
+          rows.add({'category': c.category, 'amount': c.total});
+        }
+      } else if (payload.expiryRows.isNotEmpty) {
+        columns.addAll([
+          ReportExportColumn('Product', (r) => r['product'] as String),
+          ReportExportColumn('SKU', (r) => r['sku'] as String),
+          ReportExportColumn('Qty', (r) => '${r['qty']}'),
+        ]);
+        for (final e in payload.expiryRows) {
+          rows.add({
+            'product': e.productName,
+            'sku': e.sku,
+            'qty': e.quantity,
+          });
+        }
+      } else {
+        columns.add(
+          ReportExportColumn('Note', (r) => r['label'] as String? ?? ''),
+        );
+        rows.add({
+          'label':
+              'Exported summary for ${definition.title}. Open the report in-app for full detail.',
+        });
+      }
   }
 
   return ReportExportPayload(

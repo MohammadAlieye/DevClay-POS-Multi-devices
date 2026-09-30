@@ -122,7 +122,10 @@ class CustomersBloc extends Bloc<CustomersEvent, CustomersState> {
     final current = state;
     if (current is! CustomersLoaded) return;
     try {
-      final sales = await _repository.getCustomerSales(event.customerName);
+      final sales = await _repository.getCustomerSales(
+        event.customerName,
+        customerId: event.customerId,
+      );
       final khata = await _repository.getKhataLedger(event.customerId);
       emit(
         current.copyWith(

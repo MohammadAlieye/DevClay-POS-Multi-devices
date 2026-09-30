@@ -2,6 +2,7 @@ import 'package:isar_community/isar.dart';
 
 import '../../../../core/di/injection.dart';
 import '../../../../core/lan_api/client/lan_api_client.dart';
+import '../../../../core/lan_api/client/lan_connection_monitor.dart';
 import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/collections/customer.dart';
 import '../../../../database/collections/customer_ledger_entry.dart';
@@ -59,8 +60,30 @@ class CustomersLocalDataSource {
   }
 
   Future<List<CustomerSaleSummary>> getCustomerSales(
-    String customerName,
-  ) async {
+    String customerName, {
+    int? customerId,
+  }) async {
+    if (sl<LanModeService>().isClient) {
+      final id = customerId;
+      if (id == null || id <= 0) {
+        final all = await getCustomers(query: customerName);
+        final match = all.where(
+          (c) => c.name.trim().toLowerCase() == customerName.trim().toLowerCase(),
+        );
+        if (match.isEmpty) return const [];
+        return getCustomerSales(customerName, customerId: match.first.id);
+      }
+      final items = await sl<LanApiClient>().fetchCustomerSales(id);
+      return [
+        for (final raw in items)
+          CustomerSaleSummary(
+            invoiceNo: '${raw['invoiceNo'] ?? ''}',
+            total: (raw['total'] as num?)?.toDouble() ?? 0,
+            soldAt: DateTime.tryParse('${raw['soldAt']}') ?? DateTime.now(),
+            paymentMethod: '${raw['paymentMethod'] ?? ''}',
+          ),
+      ];
+    }
     final isar = _isarService.instance;
     final key = customerName.trim().toLowerCase();
     final sales = await isar.sales.where().sortBySoldAtDesc().findAll();
@@ -78,6 +101,21 @@ class CustomersLocalDataSource {
   }
 
   Future<List<CustomerKhataEntry>> getKhataLedger(int customerId) async {
+    if (sl<LanModeService>().isClient) {
+      final items = await sl<LanApiClient>().fetchCustomerLedger(customerId);
+      return [
+        for (final raw in items)
+          CustomerKhataEntry(
+            id: (raw['id'] as num?)?.toInt() ?? 0,
+            type: '${raw['type'] ?? ''}',
+            amount: (raw['amount'] as num?)?.toDouble() ?? 0,
+            balanceAfter: (raw['balanceAfter'] as num?)?.toDouble() ?? 0,
+            entryDate: DateTime.tryParse('${raw['entryDate']}') ?? DateTime.now(),
+            reference: raw['reference'] as String?,
+            note: raw['note'] as String?,
+          ),
+      ];
+    }
     final rows = await _isarService.instance.customerLedgerEntrys
         .filter()
         .customerIdEqualTo(customerId)
@@ -191,7 +229,29 @@ class CustomersLocalDataSource {
     String? note,
   }) async {
     if (sl<LanModeService>().isClient) {
-      throw StateError('Record khata payments on the shop host PC.');
+      final online = await sl<LanConnectionMonitor>().refresh();
+      if (!online) {
+        throw StateError('Shop host offline — cannot record khata payment.');
+      }
+      final result = await sl<LanApiClient>().recordCustomerPayment(
+        customerId: customerId,
+        amount: amount,
+        note: note,
+      );
+      final customers = await getCustomers();
+      return customers.firstWhere(
+        (c) => c.id == customerId,
+        orElse: () => CustomerItem(
+          id: customerId,
+          name: '${result['name'] ?? ''}',
+          phone: '',
+          balance: (result['balance'] as num?)?.toDouble() ?? 0,
+          creditLimit: 0,
+          isActive: true,
+          totalPurchases: 0,
+          receiptCount: 0,
+        ),
+      );
     }
     if (amount <= 0) {
       throw ArgumentError('Payment amount must be greater than zero.');
