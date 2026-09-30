@@ -1,6 +1,9 @@
 import 'package:isar_community/isar.dart';
 
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/collections/product.dart';
+import '../../../../database/collections/product_variant.dart';
 import '../../../../database/collections/app_setting.dart';
 import '../../../../database/isar_service.dart';
 import '../../../../services/media/product_image_store.dart';
@@ -13,6 +16,12 @@ class ProductsLocalDataSource {
 
   final IsarService _isarService;
   final ProductImageStore _imageStore;
+
+  void _guardClientWrites() {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Manage products on the shop host PC.');
+    }
+  }
 
   Future<List<ProductItem>> getProducts({String query = ''}) async {
     final isar = _isarService.instance;
@@ -31,7 +40,15 @@ class ProductsLocalDataSource {
                 product.category.toLowerCase().contains(q) ||
                 (product.manufacturer?.toLowerCase().contains(q) ?? false);
           }).toList();
-    return filtered.map(_map).toList();
+    final variants = await isar.productVariants
+        .filter()
+        .deletedAtIsNull()
+        .findAll();
+    final byProduct = <int, List<ProductVariant>>{};
+    for (final v in variants) {
+      byProduct.putIfAbsent(v.productId, () => []).add(v);
+    }
+    return filtered.map((p) => _map(p, byProduct[p.id] ?? const [])).toList();
   }
 
   Future<List<String>> getCategories() async {
@@ -54,6 +71,7 @@ class ProductsLocalDataSource {
   }
 
   Future<ProductItem> createProduct(ProductDraft draft) async {
+    _guardClientWrites();
     final isar = _isarService.instance;
     _validateDraft(draft);
     await _ensureUniqueCodes(isar, draft);
@@ -72,6 +90,8 @@ class ProductsLocalDataSource {
           ..category = draft.category.trim()
           ..brand = _emptyToNull(draft.brand)
           ..manufacturer = _emptyToNull(draft.manufacturer)
+          ..strength = _emptyToNull(draft.strength)
+          ..hasVariants = draft.hasVariants
           ..unit = _emptyToNull(draft.unit)
           ..sellType = MeasureUnits.sellTypeKey(
             MeasureUnits.inferSellType(draft.unit),
@@ -90,13 +110,20 @@ class ProductsLocalDataSource {
       );
       await _syncUnitToSettings(isar, draft.unit!);
       await _syncCategoryToSettings(isar, draft.category);
+      await _replaceVariants(isar, id, draft);
     });
 
     final saved = await isar.products.get(id);
-    return _map(saved!);
+    final variants = await isar.productVariants
+        .filter()
+        .productIdEqualTo(id)
+        .deletedAtIsNull()
+        .findAll();
+    return _map(saved!, variants);
   }
 
   Future<ProductItem> updateProduct(int id, ProductDraft draft) async {
+    _guardClientWrites();
     final isar = _isarService.instance;
     _validateDraft(draft);
     final existing = await isar.products.get(id);
@@ -127,6 +154,8 @@ class ProductsLocalDataSource {
         ..category = draft.category.trim()
         ..brand = _emptyToNull(draft.brand)
         ..manufacturer = _emptyToNull(draft.manufacturer)
+        ..strength = _emptyToNull(draft.strength)
+        ..hasVariants = draft.hasVariants
         ..unit = _emptyToNull(draft.unit)
         ..sellType = MeasureUnits.sellTypeKey(
           MeasureUnits.inferSellType(draft.unit),
@@ -136,16 +165,26 @@ class ProductsLocalDataSource {
         ..lowStockThreshold = draft.lowStockThreshold
         ..isActive = draft.isActive
         ..imagePath = nextImage;
+      if (draft.hasVariants) {
+        existing.stock = draft.variants.fold<int>(0, (sum, v) => sum + v.stock);
+      }
       await isar.products.put(existing);
       await _syncUnitToSettings(isar, draft.unit!);
       await _syncCategoryToSettings(isar, draft.category);
+      await _replaceVariants(isar, id, draft);
     });
 
     final saved = await isar.products.get(id);
-    return _map(saved!);
+    final variants = await isar.productVariants
+        .filter()
+        .productIdEqualTo(id)
+        .deletedAtIsNull()
+        .findAll();
+    return _map(saved!, variants);
   }
 
   Future<void> deleteProduct(int id) async {
+    _guardClientWrites();
     final isar = _isarService.instance;
     final existing = await isar.products.get(id);
     if (existing == null) return;
@@ -270,7 +309,68 @@ class ProductsLocalDataSource {
     await isar.appSettings.put(settings);
   }
 
-  ProductItem _map(Product product) {
+  Future<void> _replaceVariants(
+    Isar isar,
+    int productId,
+    ProductDraft draft,
+  ) async {
+    final existing = await isar.productVariants
+        .filter()
+        .productIdEqualTo(productId)
+        .findAll();
+    for (final row in existing) {
+      row.deletedAt = DateTime.now();
+      row.isActive = false;
+    }
+    await isar.productVariants.putAll(existing);
+    if (!draft.hasVariants) return;
+
+    var stockSum = 0;
+    for (final v in draft.variants) {
+      final size = v.size.trim();
+      final color = v.color.trim();
+      if (size.isEmpty || color.isEmpty) continue;
+      stockSum += v.stock;
+      await isar.productVariants.put(
+        ProductVariant()
+          ..productId = productId
+          ..size = size
+          ..color = color
+          ..barcode = _emptyToNull(v.barcode)
+          ..sku = _emptyToNull(v.sku)
+          ..stock = v.stock
+          ..priceOverride = v.priceOverride
+          ..isActive = v.isActive
+          ..deletedAt = null,
+      );
+    }
+    final product = await isar.products.get(productId);
+    if (product != null) {
+      product.stock = stockSum;
+      await isar.products.put(product);
+    }
+  }
+
+  ProductItem _map(Product product, [List<ProductVariant> variants = const []]) {
+    final variantItems = variants
+        .where((v) => v.isActive && v.deletedAt == null)
+        .map(
+          (v) => ProductVariantItem(
+            id: v.id,
+            productId: v.productId,
+            size: v.size,
+            color: v.color,
+            barcode: v.barcode,
+            sku: v.sku,
+            stock: v.stock,
+            priceOverride: v.priceOverride,
+            isActive: v.isActive,
+          ),
+        )
+        .toList(growable: false);
+    final stock = product.hasVariants
+        ? variantItems.fold<int>(0, (sum, v) => sum + v.stock)
+        : product.stock;
     return ProductItem(
       id: product.id,
       sku: product.sku,
@@ -279,18 +379,21 @@ class ProductsLocalDataSource {
       category: product.category,
       brand: product.brand,
       manufacturer: product.manufacturer,
+      strength: product.strength,
+      hasVariants: product.hasVariants,
       unit: product.unit,
       sellingPrice: product.sellingPrice,
       wholesalePrice: product.wholesalePrice,
       purchasePrice: product.purchasePrice,
       taxRate: product.taxRate,
       taxInclusive: product.taxInclusive,
-      stock: product.stock,
+      stock: stock,
       isActive: product.isActive,
       lowStockThreshold: product.lowStockThreshold,
       manufactureDate: product.manufactureDate,
       expiryDate: product.expiryDate,
       imagePath: product.imagePath,
+      variants: variantItems,
     );
   }
 }

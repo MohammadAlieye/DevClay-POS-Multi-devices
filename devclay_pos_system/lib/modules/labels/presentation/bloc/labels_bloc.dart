@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../core/di/injection.dart';
+import '../../../../core/store_profile/store_profile_service.dart';
+import '../../../../core/store_profile/store_profiles.dart';
 import '../../../../utils/user_facing_error.dart';
 import '../../../inventory/domain/entities/inventory_entities.dart';
 import '../../../products/domain/entities/product_item.dart';
@@ -330,7 +333,9 @@ class LabelsBloc extends Bloc<LabelsEvent, LabelsState> {
       final categoryFilter = null;
       final storeTypeFilter = current is LabelsLoaded
           ? current.storeTypeFilter
-          : null;
+          : StoreProfiles.of(
+              await sl<StoreProfileService>().currentProfileId(),
+            ).labelStoreType;
       final selectedLines = current is LabelsLoaded
           ? current.selectedLines
           : const {};

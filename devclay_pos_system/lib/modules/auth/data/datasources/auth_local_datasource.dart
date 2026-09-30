@@ -1,8 +1,16 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:isar_community/isar.dart';
 
 import '../../../../core/auth/password_hasher.dart';
 import '../../../../core/auth/permissions.dart';
+import '../../../../core/di/injection.dart';
 import '../../../../core/error/failures.dart';
+import '../../../../core/lan_api/client/lan_api_client.dart';
+import '../../../../core/lan_api/client/lan_connection_monitor.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
+import '../../../../core/store_profile/store_profile_service.dart';
 import '../../../../database/collections/auth_session.dart';
 import '../../../../database/collections/store.dart';
 import '../../../../database/collections/user_account.dart';
@@ -49,6 +57,14 @@ class AuthLocalDataSource {
     required String password,
     required bool rememberMe,
   }) async {
+    if (sl<LanModeService>().isClient) {
+      return _loginViaHost(
+        username: username,
+        password: password,
+        rememberMe: rememberMe,
+      );
+    }
+
     final isar = _isarService.instance;
     final normalized = username.trim().toLowerCase();
     final user = await isar.userAccounts
@@ -85,6 +101,85 @@ class AuthLocalDataSource {
       store: null,
       rememberMe: rememberMe,
     );
+  }
+
+  Future<AuthSessionSnapshot> _loginViaHost({
+    required String username,
+    required String password,
+    required bool rememberMe,
+  }) async {
+    final online = await sl<LanConnectionMonitor>().refresh();
+    if (!online) {
+      throw const AuthFailure('Shop host offline — check Host PC and Wi‑Fi.');
+    }
+    try {
+      final remote = await sl<LanApiClient>().login(
+        username: username,
+        password: password,
+      );
+      await sl<StoreProfileService>().syncFromHostProfile();
+      final isar = _isarService.instance;
+      late UserAccount local;
+      await isar.writeTxn(() async {
+        final existing = await isar.userAccounts
+            .filter()
+            .usernameEqualTo(remote.username)
+            .findFirst();
+        if (existing != null) {
+          existing
+            ..displayName = remote.displayName
+            ..role = remote.role
+            ..permissions = List<String>.from(remote.permissions)
+            ..isActive = true
+            ..deletedAt = null;
+          await isar.userAccounts.put(existing);
+          local = existing;
+        } else {
+          final salt = base64Url.encode(
+            List<int>.generate(16, (_) => Random.secure().nextInt(256)),
+          );
+          local = UserAccount()
+            ..id = remote.id
+            ..username = remote.username
+            ..displayName = remote.displayName
+            ..role = remote.role
+            ..permissions = List<String>.from(remote.permissions)
+            ..passwordSalt = salt
+            ..passwordHash = PasswordHasher.hash(password, salt)
+            ..isActive = true
+            ..createdAt = DateTime.now();
+          await isar.userAccounts.put(local);
+        }
+        await isar.authSessions.put(
+          AuthSession()
+            ..key = sessionKey
+            ..userId = local.id
+            ..storeId = null
+            ..rememberMe = rememberMe
+            ..loggedInAt = DateTime.now(),
+        );
+      });
+      return AuthSessionSnapshot(
+        user: AuthUser(
+          id: remote.id,
+          username: remote.username,
+          displayName: remote.displayName,
+          role: remote.role,
+          permissions: AppPermission.sanitizeForRole(
+            remote.role,
+            remote.permissions.isNotEmpty
+                ? remote.permissions
+                : AppRoles.permissionsFor(remote.role),
+          ),
+        ),
+        store: null,
+        rememberMe: rememberMe,
+      );
+    } on AuthFailure {
+      rethrow;
+    } catch (e) {
+      throw AuthFailure(e.toString());
+    }
   }
 
   Future<List<StoreInfo>> getStores() async {

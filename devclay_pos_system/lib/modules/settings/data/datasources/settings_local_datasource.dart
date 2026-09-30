@@ -316,10 +316,7 @@ class SettingsLocalDataSource {
       changed = true;
     }
     if (record.productUnitsCsv.trim().isEmpty) {
-      record.productUnitsCsv = DefaultProductUnits.toCsv(
-        DefaultProductUnits.all,
-      );
-      changed = true;
+      // Leave empty until store profile wizard seeds units.
     } else {
       final merged = DefaultProductUnits.fromCsv(record.productUnitsCsv);
       final mergedCsv = DefaultProductUnits.toCsv(merged);
@@ -328,12 +325,7 @@ class SettingsLocalDataSource {
         changed = true;
       }
     }
-    if (record.productCategoriesCsv.trim().isEmpty) {
-      record.productCategoriesCsv = DefaultProductCategories.toCsv(
-        DefaultProductCategories.all,
-      );
-      changed = true;
-    }
+    // Do not auto-fill grocery categories — store profile wizard owns defaults.
     if (record.receiptContentWidthMm <= 0 ||
         record.receiptContentWidthMm > record.paperWidthMm) {
       record.receiptContentWidthMm = record.paperWidthMm >= 80 ? 72 : 48;

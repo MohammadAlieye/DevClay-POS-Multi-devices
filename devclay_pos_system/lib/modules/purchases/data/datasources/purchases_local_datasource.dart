@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:isar_community/isar.dart';
 
-import '../../../../database/collections/product.dart';
 import '../../../../core/auth/retail_actor.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
+import '../../../../database/collections/product.dart';
 import '../../../../database/collections/product_batch.dart';
 import '../../../../database/collections/purchase.dart';
 import '../../../../database/collections/purchase_return.dart';
@@ -82,6 +84,9 @@ class PurchasesLocalDataSource {
   }
 
   Future<PurchaseRecord> createPurchase(PurchaseDraft draft) async {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Create purchases on the shop host PC.');
+    }
     if (draft.lines.isEmpty) {
       throw ArgumentError('Add at least one product line.');
     }

@@ -27,149 +27,189 @@ const AppSettingSchema = CollectionSchema(
       name: r'autoPrintReceipt',
       type: IsarType.bool,
     ),
-    r'businessAddress': PropertySchema(
+    r'batchesExpiryRequired': PropertySchema(
       id: 2,
+      name: r'batchesExpiryRequired',
+      type: IsarType.bool,
+    ),
+    r'businessAddress': PropertySchema(
+      id: 3,
       name: r'businessAddress',
       type: IsarType.string,
     ),
     r'businessEmail': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'businessEmail',
       type: IsarType.string,
     ),
     r'businessName': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'businessName',
       type: IsarType.string,
     ),
     r'businessPhone': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'businessPhone',
       type: IsarType.string,
     ),
     r'cashierShiftRequired': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'cashierShiftRequired',
       type: IsarType.bool,
     ),
     r'defaultTaxInclusive': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'defaultTaxInclusive',
       type: IsarType.bool,
     ),
     r'defaultTaxRate': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'defaultTaxRate',
       type: IsarType.double,
     ),
+    r'enableBatchesExpiry': PropertySchema(
+      id: 10,
+      name: r'enableBatchesExpiry',
+      type: IsarType.bool,
+    ),
+    r'enableProductVariants': PropertySchema(
+      id: 11,
+      name: r'enableProductVariants',
+      type: IsarType.bool,
+    ),
+    r'enableVariableMeasureSales': PropertySchema(
+      id: 12,
+      name: r'enableVariableMeasureSales',
+      type: IsarType.bool,
+    ),
     r'fbrInvoiceEnabled': PropertySchema(
-      id: 9,
+      id: 13,
       name: r'fbrInvoiceEnabled',
       type: IsarType.bool,
     ),
-    r'key': PropertySchema(id: 10, name: r'key', type: IsarType.string),
+    r'key': PropertySchema(id: 14, name: r'key', type: IsarType.string),
     r'lastBackupAt': PropertySchema(
-      id: 11,
+      id: 15,
       name: r'lastBackupAt',
       type: IsarType.dateTime,
     ),
     r'lastBackupPath': PropertySchema(
-      id: 12,
+      id: 16,
       name: r'lastBackupPath',
       type: IsarType.string,
     ),
     r'paperWidthMm': PropertySchema(
-      id: 13,
+      id: 17,
       name: r'paperWidthMm',
       type: IsarType.long,
     ),
+    r'preferVolumeUnits': PropertySchema(
+      id: 18,
+      name: r'preferVolumeUnits',
+      type: IsarType.bool,
+    ),
+    r'preferredLabelStoreType': PropertySchema(
+      id: 19,
+      name: r'preferredLabelStoreType',
+      type: IsarType.string,
+    ),
     r'primaryPreset': PropertySchema(
-      id: 14,
+      id: 20,
       name: r'primaryPreset',
       type: IsarType.string,
     ),
     r'printerName': PropertySchema(
-      id: 15,
+      id: 21,
       name: r'printerName',
       type: IsarType.string,
     ),
     r'productCategoriesCsv': PropertySchema(
-      id: 16,
+      id: 22,
       name: r'productCategoriesCsv',
       type: IsarType.string,
     ),
     r'productUnitsCsv': PropertySchema(
-      id: 17,
+      id: 23,
       name: r'productUnitsCsv',
       type: IsarType.string,
     ),
     r'receiptContentWidthMm': PropertySchema(
-      id: 18,
+      id: 24,
       name: r'receiptContentWidthMm',
       type: IsarType.long,
     ),
     r'receiptCounterName': PropertySchema(
-      id: 19,
+      id: 25,
       name: r'receiptCounterName',
       type: IsarType.string,
     ),
     r'receiptFooter': PropertySchema(
-      id: 20,
+      id: 26,
       name: r'receiptFooter',
       type: IsarType.string,
     ),
     r'receiptLogoPath': PropertySchema(
-      id: 21,
+      id: 27,
       name: r'receiptLogoPath',
       type: IsarType.string,
     ),
     r'receiptPrintAlign': PropertySchema(
-      id: 22,
+      id: 28,
       name: r'receiptPrintAlign',
       type: IsarType.string,
     ),
     r'receiptSystemName': PropertySchema(
-      id: 23,
+      id: 29,
       name: r'receiptSystemName',
       type: IsarType.string,
     ),
     r'receiptTerms': PropertySchema(
-      id: 24,
+      id: 30,
       name: r'receiptTerms',
       type: IsarType.string,
     ),
     r'receiptTitle': PropertySchema(
-      id: 25,
+      id: 31,
       name: r'receiptTitle',
       type: IsarType.string,
     ),
     r'seedRevision': PropertySchema(
-      id: 26,
+      id: 32,
       name: r'seedRevision',
       type: IsarType.string,
     ),
     r'showBusinessInfoOnReceipt': PropertySchema(
-      id: 27,
+      id: 33,
       name: r'showBusinessInfoOnReceipt',
       type: IsarType.bool,
     ),
     r'stockBaseUnitsMigrated': PropertySchema(
-      id: 28,
+      id: 34,
       name: r'stockBaseUnitsMigrated',
       type: IsarType.bool,
     ),
+    r'storeProfile': PropertySchema(
+      id: 35,
+      name: r'storeProfile',
+      type: IsarType.string,
+    ),
+    r'storeProfileConfigured': PropertySchema(
+      id: 36,
+      name: r'storeProfileConfigured',
+      type: IsarType.bool,
+    ),
     r'taxEnabled': PropertySchema(
-      id: 29,
+      id: 37,
       name: r'taxEnabled',
       type: IsarType.bool,
     ),
     r'taxNumber': PropertySchema(
-      id: 30,
+      id: 38,
       name: r'taxNumber',
       type: IsarType.string,
     ),
     r'themeMode': PropertySchema(
-      id: 31,
+      id: 39,
       name: r'themeMode',
       type: IsarType.string,
     ),
@@ -222,6 +262,7 @@ int _appSettingEstimateSize(
       bytesCount += 3 + value.length * 3;
     }
   }
+  bytesCount += 3 + object.preferredLabelStoreType.length * 3;
   bytesCount += 3 + object.primaryPreset.length * 3;
   bytesCount += 3 + object.printerName.length * 3;
   bytesCount += 3 + object.productCategoriesCsv.length * 3;
@@ -239,6 +280,7 @@ int _appSettingEstimateSize(
   bytesCount += 3 + object.receiptTerms.length * 3;
   bytesCount += 3 + object.receiptTitle.length * 3;
   bytesCount += 3 + object.seedRevision.length * 3;
+  bytesCount += 3 + object.storeProfile.length * 3;
   bytesCount += 3 + object.taxNumber.length * 3;
   bytesCount += 3 + object.themeMode.length * 3;
   return bytesCount;
@@ -252,36 +294,44 @@ void _appSettingSerialize(
 ) {
   writer.writeString(offsets[0], object.accentPreset);
   writer.writeBool(offsets[1], object.autoPrintReceipt);
-  writer.writeString(offsets[2], object.businessAddress);
-  writer.writeString(offsets[3], object.businessEmail);
-  writer.writeString(offsets[4], object.businessName);
-  writer.writeString(offsets[5], object.businessPhone);
-  writer.writeBool(offsets[6], object.cashierShiftRequired);
-  writer.writeBool(offsets[7], object.defaultTaxInclusive);
-  writer.writeDouble(offsets[8], object.defaultTaxRate);
-  writer.writeBool(offsets[9], object.fbrInvoiceEnabled);
-  writer.writeString(offsets[10], object.key);
-  writer.writeDateTime(offsets[11], object.lastBackupAt);
-  writer.writeString(offsets[12], object.lastBackupPath);
-  writer.writeLong(offsets[13], object.paperWidthMm);
-  writer.writeString(offsets[14], object.primaryPreset);
-  writer.writeString(offsets[15], object.printerName);
-  writer.writeString(offsets[16], object.productCategoriesCsv);
-  writer.writeString(offsets[17], object.productUnitsCsv);
-  writer.writeLong(offsets[18], object.receiptContentWidthMm);
-  writer.writeString(offsets[19], object.receiptCounterName);
-  writer.writeString(offsets[20], object.receiptFooter);
-  writer.writeString(offsets[21], object.receiptLogoPath);
-  writer.writeString(offsets[22], object.receiptPrintAlign);
-  writer.writeString(offsets[23], object.receiptSystemName);
-  writer.writeString(offsets[24], object.receiptTerms);
-  writer.writeString(offsets[25], object.receiptTitle);
-  writer.writeString(offsets[26], object.seedRevision);
-  writer.writeBool(offsets[27], object.showBusinessInfoOnReceipt);
-  writer.writeBool(offsets[28], object.stockBaseUnitsMigrated);
-  writer.writeBool(offsets[29], object.taxEnabled);
-  writer.writeString(offsets[30], object.taxNumber);
-  writer.writeString(offsets[31], object.themeMode);
+  writer.writeBool(offsets[2], object.batchesExpiryRequired);
+  writer.writeString(offsets[3], object.businessAddress);
+  writer.writeString(offsets[4], object.businessEmail);
+  writer.writeString(offsets[5], object.businessName);
+  writer.writeString(offsets[6], object.businessPhone);
+  writer.writeBool(offsets[7], object.cashierShiftRequired);
+  writer.writeBool(offsets[8], object.defaultTaxInclusive);
+  writer.writeDouble(offsets[9], object.defaultTaxRate);
+  writer.writeBool(offsets[10], object.enableBatchesExpiry);
+  writer.writeBool(offsets[11], object.enableProductVariants);
+  writer.writeBool(offsets[12], object.enableVariableMeasureSales);
+  writer.writeBool(offsets[13], object.fbrInvoiceEnabled);
+  writer.writeString(offsets[14], object.key);
+  writer.writeDateTime(offsets[15], object.lastBackupAt);
+  writer.writeString(offsets[16], object.lastBackupPath);
+  writer.writeLong(offsets[17], object.paperWidthMm);
+  writer.writeBool(offsets[18], object.preferVolumeUnits);
+  writer.writeString(offsets[19], object.preferredLabelStoreType);
+  writer.writeString(offsets[20], object.primaryPreset);
+  writer.writeString(offsets[21], object.printerName);
+  writer.writeString(offsets[22], object.productCategoriesCsv);
+  writer.writeString(offsets[23], object.productUnitsCsv);
+  writer.writeLong(offsets[24], object.receiptContentWidthMm);
+  writer.writeString(offsets[25], object.receiptCounterName);
+  writer.writeString(offsets[26], object.receiptFooter);
+  writer.writeString(offsets[27], object.receiptLogoPath);
+  writer.writeString(offsets[28], object.receiptPrintAlign);
+  writer.writeString(offsets[29], object.receiptSystemName);
+  writer.writeString(offsets[30], object.receiptTerms);
+  writer.writeString(offsets[31], object.receiptTitle);
+  writer.writeString(offsets[32], object.seedRevision);
+  writer.writeBool(offsets[33], object.showBusinessInfoOnReceipt);
+  writer.writeBool(offsets[34], object.stockBaseUnitsMigrated);
+  writer.writeString(offsets[35], object.storeProfile);
+  writer.writeBool(offsets[36], object.storeProfileConfigured);
+  writer.writeBool(offsets[37], object.taxEnabled);
+  writer.writeString(offsets[38], object.taxNumber);
+  writer.writeString(offsets[39], object.themeMode);
 }
 
 AppSetting _appSettingDeserialize(
@@ -293,37 +343,45 @@ AppSetting _appSettingDeserialize(
   final object = AppSetting();
   object.accentPreset = reader.readString(offsets[0]);
   object.autoPrintReceipt = reader.readBool(offsets[1]);
-  object.businessAddress = reader.readString(offsets[2]);
-  object.businessEmail = reader.readString(offsets[3]);
-  object.businessName = reader.readString(offsets[4]);
-  object.businessPhone = reader.readString(offsets[5]);
-  object.cashierShiftRequired = reader.readBool(offsets[6]);
-  object.defaultTaxInclusive = reader.readBool(offsets[7]);
-  object.defaultTaxRate = reader.readDouble(offsets[8]);
-  object.fbrInvoiceEnabled = reader.readBool(offsets[9]);
+  object.batchesExpiryRequired = reader.readBool(offsets[2]);
+  object.businessAddress = reader.readString(offsets[3]);
+  object.businessEmail = reader.readString(offsets[4]);
+  object.businessName = reader.readString(offsets[5]);
+  object.businessPhone = reader.readString(offsets[6]);
+  object.cashierShiftRequired = reader.readBool(offsets[7]);
+  object.defaultTaxInclusive = reader.readBool(offsets[8]);
+  object.defaultTaxRate = reader.readDouble(offsets[9]);
+  object.enableBatchesExpiry = reader.readBool(offsets[10]);
+  object.enableProductVariants = reader.readBool(offsets[11]);
+  object.enableVariableMeasureSales = reader.readBool(offsets[12]);
+  object.fbrInvoiceEnabled = reader.readBool(offsets[13]);
   object.id = id;
-  object.key = reader.readString(offsets[10]);
-  object.lastBackupAt = reader.readDateTimeOrNull(offsets[11]);
-  object.lastBackupPath = reader.readStringOrNull(offsets[12]);
-  object.paperWidthMm = reader.readLong(offsets[13]);
-  object.primaryPreset = reader.readString(offsets[14]);
-  object.printerName = reader.readString(offsets[15]);
-  object.productCategoriesCsv = reader.readString(offsets[16]);
-  object.productUnitsCsv = reader.readString(offsets[17]);
-  object.receiptContentWidthMm = reader.readLong(offsets[18]);
-  object.receiptCounterName = reader.readString(offsets[19]);
-  object.receiptFooter = reader.readString(offsets[20]);
-  object.receiptLogoPath = reader.readStringOrNull(offsets[21]);
-  object.receiptPrintAlign = reader.readString(offsets[22]);
-  object.receiptSystemName = reader.readString(offsets[23]);
-  object.receiptTerms = reader.readString(offsets[24]);
-  object.receiptTitle = reader.readString(offsets[25]);
-  object.seedRevision = reader.readString(offsets[26]);
-  object.showBusinessInfoOnReceipt = reader.readBool(offsets[27]);
-  object.stockBaseUnitsMigrated = reader.readBool(offsets[28]);
-  object.taxEnabled = reader.readBool(offsets[29]);
-  object.taxNumber = reader.readString(offsets[30]);
-  object.themeMode = reader.readString(offsets[31]);
+  object.key = reader.readString(offsets[14]);
+  object.lastBackupAt = reader.readDateTimeOrNull(offsets[15]);
+  object.lastBackupPath = reader.readStringOrNull(offsets[16]);
+  object.paperWidthMm = reader.readLong(offsets[17]);
+  object.preferVolumeUnits = reader.readBool(offsets[18]);
+  object.preferredLabelStoreType = reader.readString(offsets[19]);
+  object.primaryPreset = reader.readString(offsets[20]);
+  object.printerName = reader.readString(offsets[21]);
+  object.productCategoriesCsv = reader.readString(offsets[22]);
+  object.productUnitsCsv = reader.readString(offsets[23]);
+  object.receiptContentWidthMm = reader.readLong(offsets[24]);
+  object.receiptCounterName = reader.readString(offsets[25]);
+  object.receiptFooter = reader.readString(offsets[26]);
+  object.receiptLogoPath = reader.readStringOrNull(offsets[27]);
+  object.receiptPrintAlign = reader.readString(offsets[28]);
+  object.receiptSystemName = reader.readString(offsets[29]);
+  object.receiptTerms = reader.readString(offsets[30]);
+  object.receiptTitle = reader.readString(offsets[31]);
+  object.seedRevision = reader.readString(offsets[32]);
+  object.showBusinessInfoOnReceipt = reader.readBool(offsets[33]);
+  object.stockBaseUnitsMigrated = reader.readBool(offsets[34]);
+  object.storeProfile = reader.readString(offsets[35]);
+  object.storeProfileConfigured = reader.readBool(offsets[36]);
+  object.taxEnabled = reader.readBool(offsets[37]);
+  object.taxNumber = reader.readString(offsets[38]);
+  object.themeMode = reader.readString(offsets[39]);
   return object;
 }
 
@@ -339,7 +397,7 @@ P _appSettingDeserializeProp<P>(
     case 1:
       return (reader.readBool(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 3:
       return (reader.readString(offset)) as P;
     case 4:
@@ -347,56 +405,72 @@ P _appSettingDeserializeProp<P>(
     case 5:
       return (reader.readString(offset)) as P;
     case 6:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 7:
       return (reader.readBool(offset)) as P;
     case 8:
-      return (reader.readDouble(offset)) as P;
-    case 9:
       return (reader.readBool(offset)) as P;
+    case 9:
+      return (reader.readDouble(offset)) as P;
     case 10:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 11:
-      return (reader.readDateTimeOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 12:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 13:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 14:
       return (reader.readString(offset)) as P;
     case 15:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 16:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 17:
-      return (reader.readString(offset)) as P;
-    case 18:
       return (reader.readLong(offset)) as P;
+    case 18:
+      return (reader.readBool(offset)) as P;
     case 19:
       return (reader.readString(offset)) as P;
     case 20:
       return (reader.readString(offset)) as P;
     case 21:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 22:
       return (reader.readString(offset)) as P;
     case 23:
       return (reader.readString(offset)) as P;
     case 24:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 25:
       return (reader.readString(offset)) as P;
     case 26:
       return (reader.readString(offset)) as P;
     case 27:
-      return (reader.readBool(offset)) as P;
+      return (reader.readStringOrNull(offset)) as P;
     case 28:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 29:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 30:
       return (reader.readString(offset)) as P;
     case 31:
+      return (reader.readString(offset)) as P;
+    case 32:
+      return (reader.readString(offset)) as P;
+    case 33:
+      return (reader.readBool(offset)) as P;
+    case 34:
+      return (reader.readBool(offset)) as P;
+    case 35:
+      return (reader.readString(offset)) as P;
+    case 36:
+      return (reader.readBool(offset)) as P;
+    case 37:
+      return (reader.readBool(offset)) as P;
+    case 38:
+      return (reader.readString(offset)) as P;
+    case 39:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -751,6 +825,18 @@ extension AppSettingQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
         FilterCondition.equalTo(property: r'autoPrintReceipt', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  batchesExpiryRequiredEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'batchesExpiryRequired',
+          value: value,
+        ),
       );
     });
   }
@@ -1416,6 +1502,39 @@ extension AppSettingQueryFilter
   }
 
   QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  enableBatchesExpiryEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'enableBatchesExpiry', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  enableProductVariantsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'enableProductVariants',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  enableVariableMeasureSalesEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'enableVariableMeasureSales',
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
   fbrInvoiceEnabledEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(
@@ -1911,6 +2030,162 @@ extension AppSettingQueryFilter
           includeLower: includeLower,
           upper: upper,
           includeUpper: includeUpper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferVolumeUnitsEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'preferVolumeUnits', value: value),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'preferredLabelStoreType',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'preferredLabelStoreType',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'preferredLabelStoreType',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'preferredLabelStoreType',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'preferredLabelStoreType',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'preferredLabelStoreType',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'preferredLabelStoreType',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'preferredLabelStoreType',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'preferredLabelStoreType',
+          value: '',
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  preferredLabelStoreTypeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          property: r'preferredLabelStoreType',
+          value: '',
         ),
       );
     });
@@ -3711,6 +3986,159 @@ extension AppSettingQueryFilter
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileEqualTo(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'storeProfile',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'storeProfile',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'storeProfile',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'storeProfile',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'storeProfile',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'storeProfile',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'storeProfile',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'storeProfile',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'storeProfile', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'storeProfile', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition>
+  storeProfileConfiguredEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'storeProfileConfigured',
+          value: value,
+        ),
+      );
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QAfterFilterCondition> taxEnabledEqualTo(
     bool value,
   ) {
@@ -4049,6 +4477,20 @@ extension AppSettingQuerySortBy
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByBatchesExpiryRequired() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchesExpiryRequired', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByBatchesExpiryRequiredDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchesExpiryRequired', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByBusinessAddress() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'businessAddress', Sort.asc);
@@ -4139,6 +4581,48 @@ extension AppSettingQuerySortBy
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableBatchesExpiry() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableBatchesExpiry', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableBatchesExpiryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableBatchesExpiry', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableProductVariants() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableProductVariants', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableProductVariantsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableProductVariants', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableVariableMeasureSales() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableVariableMeasureSales', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByEnableVariableMeasureSalesDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableVariableMeasureSales', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByFbrInvoiceEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fbrInvoiceEnabled', Sort.asc);
@@ -4198,6 +4682,33 @@ extension AppSettingQuerySortBy
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByPaperWidthMmDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'paperWidthMm', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByPreferVolumeUnits() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferVolumeUnits', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByPreferVolumeUnitsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferVolumeUnits', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByPreferredLabelStoreType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferredLabelStoreType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByPreferredLabelStoreTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferredLabelStoreType', Sort.desc);
     });
   }
 
@@ -4395,6 +4906,32 @@ extension AppSettingQuerySortBy
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByStoreProfile() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfile', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByStoreProfileDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfile', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByStoreProfileConfigured() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfileConfigured', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  sortByStoreProfileConfiguredDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfileConfigured', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> sortByTaxEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'taxEnabled', Sort.asc);
@@ -4456,6 +4993,20 @@ extension AppSettingQuerySortThenBy
   thenByAutoPrintReceiptDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'autoPrintReceipt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByBatchesExpiryRequired() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchesExpiryRequired', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByBatchesExpiryRequiredDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'batchesExpiryRequired', Sort.desc);
     });
   }
 
@@ -4549,6 +5100,48 @@ extension AppSettingQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableBatchesExpiry() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableBatchesExpiry', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableBatchesExpiryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableBatchesExpiry', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableProductVariants() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableProductVariants', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableProductVariantsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableProductVariants', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableVariableMeasureSales() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableVariableMeasureSales', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByEnableVariableMeasureSalesDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'enableVariableMeasureSales', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByFbrInvoiceEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'fbrInvoiceEnabled', Sort.asc);
@@ -4620,6 +5213,33 @@ extension AppSettingQuerySortThenBy
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByPaperWidthMmDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'paperWidthMm', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByPreferVolumeUnits() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferVolumeUnits', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByPreferVolumeUnitsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferVolumeUnits', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByPreferredLabelStoreType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferredLabelStoreType', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByPreferredLabelStoreTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'preferredLabelStoreType', Sort.desc);
     });
   }
 
@@ -4817,6 +5437,32 @@ extension AppSettingQuerySortThenBy
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByStoreProfile() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfile', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByStoreProfileDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfile', Sort.desc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByStoreProfileConfigured() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfileConfigured', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QAfterSortBy>
+  thenByStoreProfileConfiguredDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'storeProfileConfigured', Sort.desc);
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QAfterSortBy> thenByTaxEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'taxEnabled', Sort.asc);
@@ -4867,6 +5513,13 @@ extension AppSettingQueryWhereDistinct
   QueryBuilder<AppSetting, AppSetting, QDistinct> distinctByAutoPrintReceipt() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'autoPrintReceipt');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByBatchesExpiryRequired() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'batchesExpiryRequired');
     });
   }
 
@@ -4932,6 +5585,27 @@ extension AppSettingQueryWhereDistinct
   }
 
   QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByEnableBatchesExpiry() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableBatchesExpiry');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByEnableProductVariants() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableProductVariants');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByEnableVariableMeasureSales() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'enableVariableMeasureSales');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
   distinctByFbrInvoiceEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'fbrInvoiceEnabled');
@@ -4966,6 +5640,23 @@ extension AppSettingQueryWhereDistinct
   QueryBuilder<AppSetting, AppSetting, QDistinct> distinctByPaperWidthMm() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'paperWidthMm');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByPreferVolumeUnits() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'preferVolumeUnits');
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByPreferredLabelStoreType({bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(
+        r'preferredLabelStoreType',
+        caseSensitive: caseSensitive,
+      );
     });
   }
 
@@ -5109,6 +5800,21 @@ extension AppSettingQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AppSetting, AppSetting, QDistinct> distinctByStoreProfile({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'storeProfile', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<AppSetting, AppSetting, QDistinct>
+  distinctByStoreProfileConfigured() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'storeProfileConfigured');
+    });
+  }
+
   QueryBuilder<AppSetting, AppSetting, QDistinct> distinctByTaxEnabled() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'taxEnabled');
@@ -5149,6 +5855,13 @@ extension AppSettingQueryProperty
   QueryBuilder<AppSetting, bool, QQueryOperations> autoPrintReceiptProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'autoPrintReceipt');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations>
+  batchesExpiryRequiredProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'batchesExpiryRequired');
     });
   }
 
@@ -5196,6 +5909,27 @@ extension AppSettingQueryProperty
     });
   }
 
+  QueryBuilder<AppSetting, bool, QQueryOperations>
+  enableBatchesExpiryProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableBatchesExpiry');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations>
+  enableProductVariantsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableProductVariants');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations>
+  enableVariableMeasureSalesProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'enableVariableMeasureSales');
+    });
+  }
+
   QueryBuilder<AppSetting, bool, QQueryOperations> fbrInvoiceEnabledProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'fbrInvoiceEnabled');
@@ -5223,6 +5957,19 @@ extension AppSettingQueryProperty
   QueryBuilder<AppSetting, int, QQueryOperations> paperWidthMmProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'paperWidthMm');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations> preferVolumeUnitsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'preferVolumeUnits');
+    });
+  }
+
+  QueryBuilder<AppSetting, String, QQueryOperations>
+  preferredLabelStoreTypeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'preferredLabelStoreType');
     });
   }
 
@@ -5321,6 +6068,19 @@ extension AppSettingQueryProperty
   stockBaseUnitsMigratedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'stockBaseUnitsMigrated');
+    });
+  }
+
+  QueryBuilder<AppSetting, String, QQueryOperations> storeProfileProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'storeProfile');
+    });
+  }
+
+  QueryBuilder<AppSetting, bool, QQueryOperations>
+  storeProfileConfiguredProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'storeProfileConfigured');
     });
   }
 

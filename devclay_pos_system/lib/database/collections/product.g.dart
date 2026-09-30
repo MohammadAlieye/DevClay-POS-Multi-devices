@@ -45,59 +45,69 @@ const ProductSchema = CollectionSchema(
       name: r'expiryDate',
       type: IsarType.dateTime,
     ),
-    r'imagePath': PropertySchema(
+    r'hasVariants': PropertySchema(
       id: 8,
+      name: r'hasVariants',
+      type: IsarType.bool,
+    ),
+    r'imagePath': PropertySchema(
+      id: 9,
       name: r'imagePath',
       type: IsarType.string,
     ),
-    r'isActive': PropertySchema(id: 9, name: r'isActive', type: IsarType.bool),
+    r'isActive': PropertySchema(id: 10, name: r'isActive', type: IsarType.bool),
     r'itemsPerBox': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'itemsPerBox',
       type: IsarType.long,
     ),
     r'lowStockThreshold': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'lowStockThreshold',
       type: IsarType.long,
     ),
     r'manufactureDate': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'manufactureDate',
       type: IsarType.dateTime,
     ),
     r'manufacturer': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'manufacturer',
       type: IsarType.string,
     ),
-    r'name': PropertySchema(id: 14, name: r'name', type: IsarType.string),
+    r'name': PropertySchema(id: 15, name: r'name', type: IsarType.string),
     r'purchasePrice': PropertySchema(
-      id: 15,
+      id: 16,
       name: r'purchasePrice',
       type: IsarType.double,
     ),
     r'sellType': PropertySchema(
-      id: 16,
+      id: 17,
       name: r'sellType',
       type: IsarType.string,
     ),
     r'sellingPrice': PropertySchema(
-      id: 17,
+      id: 18,
       name: r'sellingPrice',
       type: IsarType.double,
     ),
-    r'sku': PropertySchema(id: 18, name: r'sku', type: IsarType.string),
-    r'stock': PropertySchema(id: 19, name: r'stock', type: IsarType.long),
+    r'sku': PropertySchema(id: 19, name: r'sku', type: IsarType.string),
+    r'stock': PropertySchema(id: 20, name: r'stock', type: IsarType.long),
+    r'strength': PropertySchema(
+      id: 21,
+      name: r'strength',
+      type: IsarType.string,
+    ),
     r'taxInclusive': PropertySchema(
-      id: 20,
+      id: 22,
       name: r'taxInclusive',
       type: IsarType.bool,
     ),
-    r'taxRate': PropertySchema(id: 21, name: r'taxRate', type: IsarType.double),
-    r'unit': PropertySchema(id: 22, name: r'unit', type: IsarType.string),
+    r'taxRate': PropertySchema(id: 23, name: r'taxRate', type: IsarType.double),
+    r'unit': PropertySchema(id: 24, name: r'unit', type: IsarType.string),
     r'wholesalePrice': PropertySchema(
-      id: 23,
+      id: 25,
       name: r'wholesalePrice',
       type: IsarType.double,
     ),
@@ -177,6 +187,12 @@ int _productEstimateSize(
   bytesCount += 3 + object.sellType.length * 3;
   bytesCount += 3 + object.sku.length * 3;
   {
+    final value = object.strength;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.unit;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -199,22 +215,24 @@ void _productSerialize(
   writer.writeString(offsets[5], object.category);
   writer.writeDateTime(offsets[6], object.deletedAt);
   writer.writeDateTime(offsets[7], object.expiryDate);
-  writer.writeString(offsets[8], object.imagePath);
-  writer.writeBool(offsets[9], object.isActive);
-  writer.writeLong(offsets[10], object.itemsPerBox);
-  writer.writeLong(offsets[11], object.lowStockThreshold);
-  writer.writeDateTime(offsets[12], object.manufactureDate);
-  writer.writeString(offsets[13], object.manufacturer);
-  writer.writeString(offsets[14], object.name);
-  writer.writeDouble(offsets[15], object.purchasePrice);
-  writer.writeString(offsets[16], object.sellType);
-  writer.writeDouble(offsets[17], object.sellingPrice);
-  writer.writeString(offsets[18], object.sku);
-  writer.writeLong(offsets[19], object.stock);
-  writer.writeBool(offsets[20], object.taxInclusive);
-  writer.writeDouble(offsets[21], object.taxRate);
-  writer.writeString(offsets[22], object.unit);
-  writer.writeDouble(offsets[23], object.wholesalePrice);
+  writer.writeBool(offsets[8], object.hasVariants);
+  writer.writeString(offsets[9], object.imagePath);
+  writer.writeBool(offsets[10], object.isActive);
+  writer.writeLong(offsets[11], object.itemsPerBox);
+  writer.writeLong(offsets[12], object.lowStockThreshold);
+  writer.writeDateTime(offsets[13], object.manufactureDate);
+  writer.writeString(offsets[14], object.manufacturer);
+  writer.writeString(offsets[15], object.name);
+  writer.writeDouble(offsets[16], object.purchasePrice);
+  writer.writeString(offsets[17], object.sellType);
+  writer.writeDouble(offsets[18], object.sellingPrice);
+  writer.writeString(offsets[19], object.sku);
+  writer.writeLong(offsets[20], object.stock);
+  writer.writeString(offsets[21], object.strength);
+  writer.writeBool(offsets[22], object.taxInclusive);
+  writer.writeDouble(offsets[23], object.taxRate);
+  writer.writeString(offsets[24], object.unit);
+  writer.writeDouble(offsets[25], object.wholesalePrice);
 }
 
 Product _productDeserialize(
@@ -232,23 +250,25 @@ Product _productDeserialize(
   object.category = reader.readString(offsets[5]);
   object.deletedAt = reader.readDateTimeOrNull(offsets[6]);
   object.expiryDate = reader.readDateTimeOrNull(offsets[7]);
+  object.hasVariants = reader.readBool(offsets[8]);
   object.id = id;
-  object.imagePath = reader.readStringOrNull(offsets[8]);
-  object.isActive = reader.readBool(offsets[9]);
-  object.itemsPerBox = reader.readLong(offsets[10]);
-  object.lowStockThreshold = reader.readLong(offsets[11]);
-  object.manufactureDate = reader.readDateTimeOrNull(offsets[12]);
-  object.manufacturer = reader.readStringOrNull(offsets[13]);
-  object.name = reader.readString(offsets[14]);
-  object.purchasePrice = reader.readDouble(offsets[15]);
-  object.sellType = reader.readString(offsets[16]);
-  object.sellingPrice = reader.readDouble(offsets[17]);
-  object.sku = reader.readString(offsets[18]);
-  object.stock = reader.readLong(offsets[19]);
-  object.taxInclusive = reader.readBool(offsets[20]);
-  object.taxRate = reader.readDouble(offsets[21]);
-  object.unit = reader.readStringOrNull(offsets[22]);
-  object.wholesalePrice = reader.readDouble(offsets[23]);
+  object.imagePath = reader.readStringOrNull(offsets[9]);
+  object.isActive = reader.readBool(offsets[10]);
+  object.itemsPerBox = reader.readLong(offsets[11]);
+  object.lowStockThreshold = reader.readLong(offsets[12]);
+  object.manufactureDate = reader.readDateTimeOrNull(offsets[13]);
+  object.manufacturer = reader.readStringOrNull(offsets[14]);
+  object.name = reader.readString(offsets[15]);
+  object.purchasePrice = reader.readDouble(offsets[16]);
+  object.sellType = reader.readString(offsets[17]);
+  object.sellingPrice = reader.readDouble(offsets[18]);
+  object.sku = reader.readString(offsets[19]);
+  object.stock = reader.readLong(offsets[20]);
+  object.strength = reader.readStringOrNull(offsets[21]);
+  object.taxInclusive = reader.readBool(offsets[22]);
+  object.taxRate = reader.readDouble(offsets[23]);
+  object.unit = reader.readStringOrNull(offsets[24]);
+  object.wholesalePrice = reader.readDouble(offsets[25]);
   return object;
 }
 
@@ -276,36 +296,40 @@ P _productDeserializeProp<P>(
     case 7:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 8:
-      return (reader.readStringOrNull(offset)) as P;
-    case 9:
       return (reader.readBool(offset)) as P;
+    case 9:
+      return (reader.readStringOrNull(offset)) as P;
     case 10:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 11:
       return (reader.readLong(offset)) as P;
     case 12:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 13:
-      return (reader.readStringOrNull(offset)) as P;
-    case 14:
-      return (reader.readString(offset)) as P;
-    case 15:
-      return (reader.readDouble(offset)) as P;
-    case 16:
-      return (reader.readString(offset)) as P;
-    case 17:
-      return (reader.readDouble(offset)) as P;
-    case 18:
-      return (reader.readString(offset)) as P;
-    case 19:
       return (reader.readLong(offset)) as P;
-    case 20:
-      return (reader.readBool(offset)) as P;
-    case 21:
-      return (reader.readDouble(offset)) as P;
-    case 22:
+    case 13:
+      return (reader.readDateTimeOrNull(offset)) as P;
+    case 14:
       return (reader.readStringOrNull(offset)) as P;
+    case 15:
+      return (reader.readString(offset)) as P;
+    case 16:
+      return (reader.readDouble(offset)) as P;
+    case 17:
+      return (reader.readString(offset)) as P;
+    case 18:
+      return (reader.readDouble(offset)) as P;
+    case 19:
+      return (reader.readString(offset)) as P;
+    case 20:
+      return (reader.readLong(offset)) as P;
+    case 21:
+      return (reader.readStringOrNull(offset)) as P;
+    case 22:
+      return (reader.readBool(offset)) as P;
     case 23:
+      return (reader.readDouble(offset)) as P;
+    case 24:
+      return (reader.readStringOrNull(offset)) as P;
+    case 25:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1511,6 +1535,16 @@ extension ProductQueryFilter
           upper: upper,
           includeUpper: includeUpper,
         ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> hasVariantsEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'hasVariants', value: value),
       );
     });
   }
@@ -2743,6 +2777,168 @@ extension ProductQueryFilter
     });
   }
 
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'strength'),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'strength'),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'strength',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'strength',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'strength',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'strength',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'strength',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'strength',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthContains(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'strength',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthMatches(
+    String pattern, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'strength',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'strength', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterFilterCondition> strengthIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'strength', value: ''),
+      );
+    });
+  }
+
   QueryBuilder<Product, Product, QAfterFilterCondition> taxInclusiveEqualTo(
     bool value,
   ) {
@@ -3168,6 +3364,18 @@ extension ProductQuerySortBy on QueryBuilder<Product, Product, QSortBy> {
     });
   }
 
+  QueryBuilder<Product, Product, QAfterSortBy> sortByHasVariants() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasVariants', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> sortByHasVariantsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasVariants', Sort.desc);
+    });
+  }
+
   QueryBuilder<Product, Product, QAfterSortBy> sortByImagePath() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'imagePath', Sort.asc);
@@ -3309,6 +3517,18 @@ extension ProductQuerySortBy on QueryBuilder<Product, Product, QSortBy> {
   QueryBuilder<Product, Product, QAfterSortBy> sortByStockDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'stock', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> sortByStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'strength', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> sortByStrengthDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'strength', Sort.desc);
     });
   }
 
@@ -3456,6 +3676,18 @@ extension ProductQuerySortThenBy
   QueryBuilder<Product, Product, QAfterSortBy> thenByExpiryDateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'expiryDate', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> thenByHasVariants() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasVariants', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> thenByHasVariantsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'hasVariants', Sort.desc);
     });
   }
 
@@ -3615,6 +3847,18 @@ extension ProductQuerySortThenBy
     });
   }
 
+  QueryBuilder<Product, Product, QAfterSortBy> thenByStrength() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'strength', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Product, Product, QAfterSortBy> thenByStrengthDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'strength', Sort.desc);
+    });
+  }
+
   QueryBuilder<Product, Product, QAfterSortBy> thenByTaxInclusive() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'taxInclusive', Sort.asc);
@@ -3724,6 +3968,12 @@ extension ProductQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Product, Product, QDistinct> distinctByHasVariants() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'hasVariants');
+    });
+  }
+
   QueryBuilder<Product, Product, QDistinct> distinctByImagePath({
     bool caseSensitive = true,
   }) {
@@ -3803,6 +4053,14 @@ extension ProductQueryWhereDistinct
   QueryBuilder<Product, Product, QDistinct> distinctByStock() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'stock');
+    });
+  }
+
+  QueryBuilder<Product, Product, QDistinct> distinctByStrength({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'strength', caseSensitive: caseSensitive);
     });
   }
 
@@ -3889,6 +4147,12 @@ extension ProductQueryProperty
     });
   }
 
+  QueryBuilder<Product, bool, QQueryOperations> hasVariantsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'hasVariants');
+    });
+  }
+
   QueryBuilder<Product, String?, QQueryOperations> imagePathProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'imagePath');
@@ -3958,6 +4222,12 @@ extension ProductQueryProperty
   QueryBuilder<Product, int, QQueryOperations> stockProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'stock');
+    });
+  }
+
+  QueryBuilder<Product, String?, QQueryOperations> strengthProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'strength');
     });
   }
 

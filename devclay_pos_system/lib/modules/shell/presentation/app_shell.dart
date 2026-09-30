@@ -5,6 +5,9 @@ import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../constants/app_constants.dart';
+import '../../../core/di/injection.dart';
+import '../../../core/lan_api/client/lan_connection_monitor.dart';
+import '../../../core/lan_api/lan_mode_service.dart';
 import '../../../core/responsive/breakpoints.dart';
 import '../../../modules/auth/presentation/widgets/sign_out_dialog.dart';
 import '../../../modules/auth/presentation/bloc/auth_bloc.dart';
@@ -40,6 +43,9 @@ class _AppShellState extends State<AppShell> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<NotificationsCubit>().refresh();
+      if (sl<LanModeService>().isClient) {
+        sl<LanConnectionMonitor>().refresh();
+      }
     });
   }
 
@@ -80,6 +86,9 @@ class _AppShellState extends State<AppShell> {
                     : () => setState(() => _collapsed = !_collapsed),
                 onNavigate: (path) {
                   setState(() => _posMenuOpen = false);
+                  if (sl<LanModeService>().isClient) {
+                    sl<LanConnectionMonitor>().refresh();
+                  }
                   context.go(path);
                 },
               ),

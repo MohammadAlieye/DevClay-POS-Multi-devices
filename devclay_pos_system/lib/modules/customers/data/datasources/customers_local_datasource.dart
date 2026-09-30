@@ -1,5 +1,8 @@
 import 'package:isar_community/isar.dart';
 
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/client/lan_api_client.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/collections/customer.dart';
 import '../../../../database/collections/customer_ledger_entry.dart';
 import '../../../../database/collections/sale.dart';
@@ -12,6 +15,32 @@ class CustomersLocalDataSource {
   final IsarService _isarService;
 
   Future<List<CustomerItem>> getCustomers({String query = ''}) async {
+    if (sl<LanModeService>().isClient) {
+      final items = await sl<LanApiClient>().fetchCustomers();
+      final mapped = [
+        for (final raw in items)
+          CustomerItem(
+            id: (raw['id'] as num?)?.toInt() ?? 0,
+            name: '${raw['name'] ?? ''}',
+            phone: '${raw['phone'] ?? ''}',
+            balance: (raw['balance'] as num?)?.toDouble() ?? 0,
+            creditLimit: (raw['creditLimit'] as num?)?.toDouble() ?? 0,
+            isActive: raw['isActive'] != false,
+            totalPurchases: 0,
+            receiptCount: 0,
+            email: raw['email'] as String?,
+            address: raw['address'] as String?,
+            notes: raw['notes'] as String?,
+          ),
+      ];
+      final q = query.trim().toLowerCase();
+      if (q.isEmpty) return mapped;
+      return mapped.where((customer) {
+        return customer.name.toLowerCase().contains(q) ||
+            customer.phone.contains(q) ||
+            (customer.email?.toLowerCase().contains(q) ?? false);
+      }).toList();
+    }
     final isar = _isarService.instance;
     final customers = await isar.customers.where().sortByName().findAll();
     final sales = await isar.sales.where().findAll();
@@ -84,6 +113,33 @@ class CustomersLocalDataSource {
       throw ArgumentError('Enter a valid customer email address.');
     }
 
+    if (sl<LanModeService>().isClient) {
+      if (id != null) {
+        throw StateError('Edit customers on the shop host PC.');
+      }
+      final created = await sl<LanApiClient>().createCustomer({
+        'name': name,
+        'phone': phone,
+        'email': _emptyToNull(draft.email),
+        'address': _emptyToNull(draft.address),
+        'notes': _emptyToNull(draft.notes),
+        'creditLimit': draft.creditLimit,
+      });
+      return CustomerItem(
+        id: (created['id'] as num?)?.toInt() ?? 0,
+        name: name,
+        phone: phone,
+        balance: 0,
+        creditLimit: draft.creditLimit,
+        isActive: true,
+        totalPurchases: 0,
+        receiptCount: 0,
+        email: _emptyToNull(draft.email),
+        address: _emptyToNull(draft.address),
+        notes: _emptyToNull(draft.notes),
+      );
+    }
+
     final isar = _isarService.instance;
 
     if (id == null) {
@@ -134,6 +190,9 @@ class CustomersLocalDataSource {
     required double amount,
     String? note,
   }) async {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Record khata payments on the shop host PC.');
+    }
     if (amount <= 0) {
       throw ArgumentError('Payment amount must be greater than zero.');
     }
@@ -177,6 +236,9 @@ class CustomersLocalDataSource {
     required double amountChange,
     String? note,
   }) async {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Adjust khata on the shop host PC.');
+    }
     if (amountChange == 0) {
       throw ArgumentError('Balance change cannot be zero.');
     }

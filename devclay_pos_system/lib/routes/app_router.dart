@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../core/auth/go_router_refresh_stream.dart';
 import '../core/auth/permissions.dart';
 import '../core/di/injection.dart';
+import '../core/store_profile/store_profile_service.dart';
 import '../modules/auth/domain/entities/auth_entities.dart';
 import '../modules/auth/presentation/bloc/auth_bloc.dart';
 import '../modules/auth/presentation/pages/login_page.dart';
@@ -25,6 +26,7 @@ import '../modules/inventory/presentation/pages/inventory_page.dart';
 import '../modules/pos/presentation/pages/pos_page.dart';
 import '../modules/products/presentation/pages/products_page.dart';
 import '../modules/recycle_bin/presentation/pages/recycle_bin_page.dart';
+import '../modules/setup/presentation/pages/store_profile_setup_page.dart';
 import '../modules/shell/presentation/app_shell.dart';
 import '../themes/app_durations.dart';
 import 'app_routes.dart';
@@ -39,14 +41,15 @@ final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>(
 GoRouter createAppRouter() {
   final authBloc = sl<AuthBloc>();
   final licenseBloc = sl<LicenseBloc>();
+  final storeProfile = sl<StoreProfileService>();
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: AppRoutes.license,
-    refreshListenable: GoRouterRefreshStream([
-      authBloc.stream,
-      licenseBloc.stream,
-    ]),
+    refreshListenable: GoRouterRefreshStream(
+      [authBloc.stream, licenseBloc.stream],
+      listenables: [storeProfile],
+    ),
     redirect: (context, state) {
       final licenseState = licenseBloc.state;
       final authState = authBloc.state;
@@ -54,6 +57,7 @@ GoRouter createAppRouter() {
       final onLicense = location == AppRoutes.license;
       final onLogin = location == AppRoutes.login;
       final onStoreSelect = location == AppRoutes.selectStore;
+      final onSetupProfile = location == AppRoutes.setupStoreProfile;
 
       // Always return null when already on the target — returning the same
       // path with refreshListenable causes an infinite redirect/frame loop.
@@ -86,7 +90,28 @@ GoRouter createAppRouter() {
       }
 
       if (authState is AuthAuthenticated) {
+        final canConfigureProfile =
+            AppRoles.isOwner(authState.session.user.role) ||
+                authState.session.user.role == AppRoles.manager ||
+                authState.session.user.hasPermission(
+                  AppPermission.settingsManage,
+                );
+        final profileReady = storeProfile.isConfiguredCached;
+
+        if (!profileReady && canConfigureProfile) {
+          return onSetupProfile ? null : AppRoutes.setupStoreProfile;
+        }
+
+        if (onSetupProfile) {
+          return profileReady
+              ? _homeRouteFor(authState.session.user)
+              : (canConfigureProfile ? null : _homeRouteFor(authState.session.user));
+        }
+
         if (onLogin || onStoreSelect) {
+          if (!profileReady && canConfigureProfile) {
+            return AppRoutes.setupStoreProfile;
+          }
           return _homeRouteFor(authState.session.user);
         }
 
@@ -114,6 +139,11 @@ GoRouter createAppRouter() {
         path: AppRoutes.selectStore,
         pageBuilder: (context, state) =>
             _fadeSlide(state, const StoreSelectionPage()),
+      ),
+      GoRoute(
+        path: AppRoutes.setupStoreProfile,
+        pageBuilder: (context, state) =>
+            _fadeSlide(state, const StoreProfileSetupPage()),
       ),
       ShellRoute(
         navigatorKey: _shellNavigatorKey,

@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../../themes/app_colors.dart';
 import '../../../../core/auth/permissions.dart';
 import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../routes/app_router.dart';
 import '../../../../services/retail/retail_control_service.dart';
 import '../../../../themes/app_durations.dart';
@@ -213,15 +214,16 @@ class _PosCartPanelState extends State<PosCartPanel> {
                       ],
                     ),
                   ),
-                  Badge(
-                    isLabelVisible: state.heldSales.isNotEmpty,
-                    label: Text('${state.heldSales.length}'),
-                    child: AppIconButton(
-                      icon: Symbols.history,
-                      tooltip: 'Held bills — resume paused sales',
-                      onPressed: () => showHeldSalesSheet(context),
+                  if (!sl<LanModeService>().isClient)
+                    Badge(
+                      isLabelVisible: state.heldSales.isNotEmpty,
+                      label: Text('${state.heldSales.length}'),
+                      child: AppIconButton(
+                        icon: Symbols.history,
+                        tooltip: 'Held bills — resume paused sales',
+                        onPressed: () => showHeldSalesSheet(context),
+                      ),
                     ),
-                  ),
                   TextButton.icon(
                     icon: const Icon(Symbols.point_of_sale, size: 18),
                     label: const Text('Shift / tally'),
@@ -408,26 +410,27 @@ class _PosCartPanelState extends State<PosCartPanel> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-
-                      Expanded(
-                        flex: 2,
-                        child: Tooltip(
-                          message: 'Hold bill',
-                          child: AppButton(
-                            label: 'Hold',
-                            expanded: true,
-                            height: 64,
-                            variant: AppButtonVariant.secondary,
-                            icon: Symbols.pause_circle,
-                            onPressed: state.lines.isEmpty
-                                ? null
-                                : () => context.read<PosBloc>().add(
-                                    const PosHoldRequested(),
-                                  ),
+                      if (!sl<LanModeService>().isClient) ...[
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          flex: 2,
+                          child: Tooltip(
+                            message: 'Hold bill',
+                            child: AppButton(
+                              label: 'Hold',
+                              expanded: true,
+                              height: 64,
+                              variant: AppButtonVariant.secondary,
+                              icon: Symbols.pause_circle,
+                              onPressed: state.lines.isEmpty
+                                  ? null
+                                  : () => context.read<PosBloc>().add(
+                                      const PosHoldRequested(),
+                                    ),
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ],

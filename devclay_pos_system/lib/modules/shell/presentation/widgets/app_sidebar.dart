@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/auth/permissions.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../routes/app_routes.dart';
 import '../../../../constants/developer_contact.dart';
 import '../../../../themes/app_colors.dart';
@@ -152,11 +154,22 @@ class AppSidebar extends StatelessWidget {
     final expandedWidth = collapsed
         ? AppSpacing.sidebarCollapsedWidth
         : AppSpacing.sidebarWidth;
+    final isClient = sl<LanModeService>().isClient;
+    const clientHidden = {
+      AppRoutes.products,
+      AppRoutes.inventory,
+      AppRoutes.purchases,
+      AppRoutes.finance,
+      AppRoutes.accounts,
+      AppRoutes.users,
+      AppRoutes.recycleBin,
+    };
     final items = kSidebarItems
         .where(
           (item) =>
               item.permission == null || permissions.contains(item.permission),
         )
+        .where((item) => !isClient || !clientHidden.contains(item.path))
         .toList();
 
     // AnimatedContainer(width:0) + OverflowBox can busy-loop frames on macOS.

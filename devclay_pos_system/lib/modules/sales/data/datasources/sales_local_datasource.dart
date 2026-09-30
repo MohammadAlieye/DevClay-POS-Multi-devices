@@ -2,14 +2,18 @@ import 'dart:convert';
 
 import 'package:isar_community/isar.dart';
 
-import '../../../../database/collections/sale.dart';
 import '../../../../core/auth/retail_actor.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/client/lan_api_client.dart';
+import '../../../../core/lan_api/client/lan_connection_monitor.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/collections/account.dart';
 import '../../../../database/collections/customer.dart';
 import '../../../../database/collections/customer_ledger_entry.dart';
 import '../../../../database/collections/ledger_entry.dart';
 import '../../../../database/collections/product.dart';
 import '../../../../database/collections/product_batch.dart';
+import '../../../../database/collections/sale.dart';
 import '../../../../database/collections/sale_return.dart';
 import '../../../../database/collections/stock_movement.dart';
 import '../../../../database/isar_service.dart';
@@ -22,6 +26,14 @@ class SalesLocalDataSource {
   final IsarService _isarService;
 
   Future<List<SaleRecord>> getSales({String query = ''}) async {
+    if (sl<LanModeService>().isClient) {
+      final online = await sl<LanConnectionMonitor>().refresh();
+      if (!online) {
+        throw StateError('Shop host offline — check Host PC and Wi‑Fi.');
+      }
+      final items = await sl<LanApiClient>().fetchSales(query: query);
+      return [for (final raw in items) _mapHostSale(raw, lines: const [])];
+    }
     final isar = _isarService.instance;
     final all = await isar.sales.where().sortBySoldAtDesc().findAll();
     final q = query.trim().toLowerCase();
@@ -36,12 +48,28 @@ class SalesLocalDataSource {
   }
 
   Future<SaleRecord?> getSaleById(int id) async {
+    if (sl<LanModeService>().isClient) {
+      final raw = await sl<LanApiClient>().fetchSaleById(id);
+      final linesJson = '${raw['linesJson'] ?? '[]'}';
+      return _mapHostSale(raw, lines: _decodeLines(linesJson));
+    }
     final sale = await _isarService.instance.sales.get(id);
     if (sale == null) return null;
     return _mapSale(sale);
   }
 
   Future<SaleRecord?> getSaleByInvoice(String invoiceNo) async {
+    if (sl<LanModeService>().isClient) {
+      final items = await sl<LanApiClient>().fetchSales(query: invoiceNo, limit: 20);
+      for (final raw in items) {
+        if ('${raw['invoiceNo']}' == invoiceNo) {
+          final id = (raw['id'] as num?)?.toInt();
+          if (id == null) continue;
+          return getSaleById(id);
+        }
+      }
+      return null;
+    }
     final sale = await _isarService.instance.sales
         .filter()
         .invoiceNoEqualTo(invoiceNo)
@@ -115,6 +143,9 @@ class SalesLocalDataSource {
   }
 
   Future<SaleReturnResult> processReturn(SaleReturnRequest request) async {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Returns must be processed on the shop host PC.');
+    }
     if (request.lines.isEmpty) throw ArgumentError('Select items to return.');
     if (request.reason.trim().isEmpty) {
       throw ArgumentError('Return reason is required.');
@@ -405,6 +436,33 @@ class SalesLocalDataSource {
       cashierName: sale.cashierName,
       status: sale.status,
       returnedAmount: sale.returnedAmount,
+    );
+  }
+
+  SaleRecord _mapHostSale(
+    Map<String, dynamic> raw, {
+    required List<SaleLineItem> lines,
+  }) {
+    return SaleRecord(
+      id: (raw['id'] as num?)?.toInt() ?? 0,
+      invoiceNo: '${raw['invoiceNo'] ?? ''}',
+      customerName: '${raw['customerName'] ?? 'Walk-in'}',
+      paymentMethod: '${raw['paymentMethod'] ?? ''}',
+      subtotal: (raw['subtotal'] as num?)?.toDouble() ?? 0,
+      discount: (raw['discount'] as num?)?.toDouble() ?? 0,
+      tax: (raw['tax'] as num?)?.toDouble() ?? 0,
+      total: (raw['total'] as num?)?.toDouble() ?? 0,
+      amountPaid: (raw['amountPaid'] as num?)?.toDouble() ?? 0,
+      changeAmount: (raw['changeAmount'] as num?)?.toDouble() ?? 0,
+      itemCount: (raw['itemCount'] as num?)?.toInt() ?? 0,
+      lines: lines,
+      soldAt: DateTime.tryParse('${raw['soldAt']}') ?? DateTime.now(),
+      notes: raw['notes'] as String?,
+      customerId: (raw['customerId'] as num?)?.toInt(),
+      cashierId: (raw['cashierId'] as num?)?.toInt(),
+      cashierName: raw['cashierName'] as String?,
+      status: '${raw['status'] ?? 'completed'}',
+      returnedAmount: (raw['returnedAmount'] as num?)?.toDouble() ?? 0,
     );
   }
 }

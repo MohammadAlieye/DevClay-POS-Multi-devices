@@ -26,6 +26,9 @@ Future<ProductDraft?> showProductEditorSheet({
   bool taxEnabled = true,
   double defaultTaxRate = 17,
   bool defaultTaxInclusive = true,
+  bool enableVariants = false,
+  bool showStrength = false,
+  bool preferVolumeUnits = false,
 }) {
   return showDialog<ProductDraft>(
     context: context,
@@ -38,6 +41,9 @@ Future<ProductDraft?> showProductEditorSheet({
       taxEnabled: taxEnabled,
       defaultTaxRate: defaultTaxRate,
       defaultTaxInclusive: defaultTaxInclusive,
+      enableVariants: enableVariants,
+      showStrength: showStrength,
+      preferVolumeUnits: preferVolumeUnits,
     ),
   );
 }
@@ -51,6 +57,9 @@ class _ProductEditorDialog extends StatefulWidget {
     required this.taxEnabled,
     required this.defaultTaxRate,
     required this.defaultTaxInclusive,
+    this.enableVariants = false,
+    this.showStrength = false,
+    this.preferVolumeUnits = false,
   });
 
   final List<String> categories;
@@ -60,6 +69,9 @@ class _ProductEditorDialog extends StatefulWidget {
   final bool taxEnabled;
   final double defaultTaxRate;
   final bool defaultTaxInclusive;
+  final bool enableVariants;
+  final bool showStrength;
+  final bool preferVolumeUnits;
 
   @override
   State<_ProductEditorDialog> createState() => _ProductEditorDialogState();
@@ -72,6 +84,7 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
   late final TextEditingController _category;
   late final TextEditingController _brand;
   late final TextEditingController _manufacturer;
+  late final TextEditingController _strength;
   late final TextEditingController _unit;
   late final TextEditingController _tax;
   late final TextEditingController _lowStockAlert;
@@ -90,8 +103,13 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
   bool _clearImage = false;
   bool _taxInclusive = true;
   bool _isActive = true;
+  bool _hasVariants = false;
   bool _handlingClose = false;
   late final FocusNode _dialogFocus;
+  final List<ProductVariantDraft> _variants = [];
+  final _variantSize = TextEditingController();
+  final _variantColor = TextEditingController();
+  final _variantStock = TextEditingController(text: '0');
 
   @override
   void initState() {
@@ -99,13 +117,21 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
     _dialogFocus = FocusNode(debugLabel: 'product-editor-dialog');
     HardwareKeyboard.instance.addHandler(_onHardwareKey);
     final e = widget.existing;
-    final defaultUnit = widget.units.isNotEmpty ? widget.units.first : 'pcs';
+    var defaultUnit = widget.units.isNotEmpty ? widget.units.first : 'pcs';
+    if (widget.preferVolumeUnits) {
+      if (widget.units.any((u) => u.toLowerCase() == 'l')) {
+        defaultUnit = widget.units.firstWhere((u) => u.toLowerCase() == 'l');
+      } else if (widget.units.any((u) => u.toLowerCase() == 'ml')) {
+        defaultUnit = widget.units.firstWhere((u) => u.toLowerCase() == 'ml');
+      }
+    }
     _name = TextEditingController(text: e?.name ?? '');
     _sku = TextEditingController(text: e?.sku ?? '');
     _barcode = TextEditingController(text: e?.barcode ?? '');
     _category = TextEditingController(text: e?.category ?? '');
     _brand = TextEditingController(text: e?.brand ?? '');
     _manufacturer = TextEditingController(text: e?.manufacturer ?? '');
+    _strength = TextEditingController(text: e?.strength ?? '');
     _unit = TextEditingController(text: e?.unit ?? defaultUnit);
     final defaultRate = widget.taxEnabled ? widget.defaultTaxRate : 0.0;
     _tax = TextEditingController(
@@ -119,6 +145,23 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
         e?.taxInclusive ??
         (widget.taxEnabled ? widget.defaultTaxInclusive : false);
     _isActive = e?.isActive ?? true;
+    _hasVariants = e?.hasVariants ?? false;
+    if (e != null) {
+      _variants.addAll(
+        e.variants.map(
+          (v) => ProductVariantDraft(
+            id: v.id,
+            size: v.size,
+            color: v.color,
+            barcode: v.barcode,
+            sku: v.sku,
+            stock: v.stock,
+            priceOverride: v.priceOverride,
+            isActive: v.isActive,
+          ),
+        ),
+      );
+    }
     if (_imagePath != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _refreshImageInfo());
     }
@@ -134,9 +177,13 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
     _category.dispose();
     _brand.dispose();
     _manufacturer.dispose();
+    _strength.dispose();
     _unit.dispose();
     _tax.dispose();
     _lowStockAlert.dispose();
+    _variantSize.dispose();
+    _variantColor.dispose();
+    _variantStock.dispose();
     super.dispose();
   }
 
@@ -353,6 +400,8 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
         category: category,
         brand: _brand.text.trim(),
         manufacturer: _manufacturer.text.trim(),
+        strength: _strength.text.trim(),
+        hasVariants: widget.enableVariants && _hasVariants,
         unit: unit,
         taxRate: parsedTax!,
         taxInclusive: widget.taxEnabled ? _taxInclusive : false,
@@ -361,6 +410,7 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
         imagePath: _clearImage ? null : _imagePath,
         pendingImageSourcePath: _pendingImageSource,
         clearImage: _clearImage,
+        variants: List<ProductVariantDraft>.from(_variants),
       ),
     );
   }
@@ -485,6 +535,98 @@ class _ProductEditorDialogState extends State<_ProductEditorDialog> {
                             ),
                           ],
                         ),
+                        if (widget.showStrength) ...[
+                          const SizedBox(height: AppSpacing.sm),
+                          TextField(
+                            controller: _strength,
+                            decoration: const InputDecoration(
+                              labelText: 'Strength (optional)',
+                              hintText: 'e.g. 500mg',
+                            ),
+                          ),
+                        ],
+                        if (widget.enableVariants) ...[
+                          const SizedBox(height: AppSpacing.md),
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('Size / color variants'),
+                            value: _hasVariants,
+                            onChanged: (v) => setState(() => _hasVariants = v),
+                          ),
+                          if (_hasVariants) ...[
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _variantSize,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Size',
+                                      hintText: 'M',
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _variantColor,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Color',
+                                      hintText: 'Black',
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                SizedBox(
+                                  width: 80,
+                                  child: TextField(
+                                    controller: _variantStock,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Qty',
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    final size = _variantSize.text.trim();
+                                    final color = _variantColor.text.trim();
+                                    final stock =
+                                        int.tryParse(_variantStock.text.trim()) ??
+                                            0;
+                                    if (size.isEmpty || color.isEmpty) return;
+                                    setState(() {
+                                      _variants.add(
+                                        ProductVariantDraft(
+                                          size: size,
+                                          color: color,
+                                          stock: stock,
+                                        ),
+                                      );
+                                      _variantSize.clear();
+                                      _variantColor.clear();
+                                      _variantStock.text = '0';
+                                    });
+                                  },
+                                  icon: const Icon(Symbols.add),
+                                ),
+                              ],
+                            ),
+                            for (var i = 0; i < _variants.length; i++)
+                              ListTile(
+                                dense: true,
+                                title: Text(
+                                  '${_variants[i].size} / ${_variants[i].color}',
+                                ),
+                                subtitle: Text('Stock: ${_variants[i].stock}'),
+                                trailing: IconButton(
+                                  icon: const Icon(Symbols.delete),
+                                  onPressed: () => setState(() {
+                                    _variants.removeAt(i);
+                                  }),
+                                ),
+                              ),
+                          ],
+                        ],
                         const SizedBox(height: AppSpacing.md),
                         TextField(
                           controller: _category,

@@ -3,6 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../constants/developer_contact.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/client/lan_connection_monitor.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../themes/app_colors.dart';
 import '../../../../themes/app_durations.dart';
 import '../../../../themes/app_radii.dart';
@@ -130,6 +133,10 @@ class ShellTopBar extends StatelessWidget {
                 _StoreChip(storeName: storeName, showName: showStoreName),
                 const SizedBox(width: AppSpacing.sm),
               ],
+              if (sl<LanModeService>().isClient) ...[
+                const _LanHostStatusChip(),
+                const SizedBox(width: AppSpacing.sm),
+              ],
               BlocBuilder<ThemeCubit, AppThemeState>(
                 buildWhen: (previous, current) => previous.mode != current.mode,
                 builder: (context, themeState) {
@@ -212,6 +219,57 @@ class ShellTopBar extends StatelessWidget {
 }
 
 enum _StatusMode { full, compact, icon }
+
+class _LanHostStatusChip extends StatelessWidget {
+  const _LanHostStatusChip();
+
+  @override
+  Widget build(BuildContext context) {
+    final monitor = sl<LanConnectionMonitor>();
+    return AnimatedBuilder(
+      animation: monitor,
+      builder: (context, _) {
+        final online = monitor.online;
+        final theme = Theme.of(context);
+        return Tooltip(
+          message: monitor.status ?? (online ? 'Host online' : 'Host offline'),
+          child: InkWell(
+            onTap: () => monitor.refresh(),
+            borderRadius: AppRadii.xsAll,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.8),
+                borderRadius: AppRadii.xsAll,
+                border: Border.all(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.5),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: online ? AppColors.success : AppColors.danger,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    online ? 'Host online' : 'Host offline',
+                    style: theme.textTheme.labelMedium,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
 class _OfflineStatusBanner extends StatelessWidget {
   const _OfflineStatusBanner({required this.mode});

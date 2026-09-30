@@ -80,4 +80,20 @@ class AppSetting {
 
   /// One-time migration: kg/L stock converted to gram/ml base units.
   bool stockBaseUnitsMigrated = false;
+
+  /// Store vertical: pharmacy | clothing | milk | super_store | general_retail.
+  String storeProfile = '';
+
+  /// True after the store-profile wizard (or Settings) has been completed.
+  bool storeProfileConfigured = false;
+
+  /// Feature flags (seeded from profile; overridable in Settings later).
+  bool enableBatchesExpiry = true;
+  bool batchesExpiryRequired = false;
+  bool enableProductVariants = false;
+  bool enableVariableMeasureSales = true;
+  bool preferVolumeUnits = false;
+
+  /// Preferred [LabelStoreType] name for labels module.
+  String preferredLabelStoreType = 'retail';
 }

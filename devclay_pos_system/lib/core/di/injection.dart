@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
 
 import '../../database/isar_service.dart';
 import '../../modules/auth/data/auth_repository_impl.dart';
@@ -84,6 +85,12 @@ import '../../services/retail/retail_control_service.dart';
 import '../../modules/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../themes/app_theme_presets.dart';
 import '../../themes/theme_cubit.dart';
+import '../store_profile/store_profile_service.dart';
+import '../lan/lan_mode_service.dart';
+import '../lan/shop_host_server.dart';
+import '../lan/lan_api_client.dart';
+import '../lan_api/host/sale_write_service.dart';
+import '../lan_api/client/lan_connection_monitor.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -91,6 +98,26 @@ Future<void> configureDependencies() async {
   final isarService = IsarService();
   await isarService.open();
   sl.registerSingleton<IsarService>(isarService);
+  sl.registerLazySingleton<StoreProfileService>(
+    () => StoreProfileService(sl()),
+  );
+  await sl<StoreProfileService>().load();
+  sl.registerLazySingleton<LanModeService>(() => LanModeService());
+  await sl<LanModeService>().load();
+  sl.registerLazySingleton<SaleWriteService>(() => SaleWriteService(sl()));
+  sl.registerLazySingleton<ShopHostServer>(
+    () => ShopHostServer(sl(), sl(), sl()),
+  );
+  sl.registerLazySingleton<LanApiClient>(() => LanApiClient(sl()));
+  sl.registerLazySingleton<LanConnectionMonitor>(
+    () => LanConnectionMonitor(sl(), sl()),
+  );
+  if (sl<LanModeService>().isHost) {
+    unawaited(sl<ShopHostServer>().start());
+  }
+  if (sl<LanModeService>().isClient) {
+    unawaited(sl<LanConnectionMonitor>().refresh());
+  }
   sl.registerLazySingleton<RetailControlService>(
     () => RetailControlService(sl()),
   );

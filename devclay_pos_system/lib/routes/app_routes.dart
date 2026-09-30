@@ -3,6 +3,7 @@ abstract final class AppRoutes {
   static const String license = '/license';
   static const String login = '/login';
   static const String selectStore = '/select-store';
+  static const String setupStoreProfile = '/setup-store-profile';
   static const String dashboard = '/dashboard';
   static const String pos = '/pos';
   static const String products = '/products';

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:isar_community/isar.dart';
 
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/collections/product.dart';
 import '../../../../database/collections/product_batch.dart';
 import '../../../../database/collections/purchase.dart';
@@ -133,6 +135,9 @@ class InventoryLocalDataSource {
   }
 
   Future<void> adjustStock(StockAdjustRequest request) async {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Adjust inventory on the shop host PC.');
+    }
     if (request.quantityChange == 0) {
       throw ArgumentError('Quantity change cannot be zero.');
     }

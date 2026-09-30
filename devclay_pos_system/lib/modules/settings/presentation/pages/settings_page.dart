@@ -33,6 +33,7 @@ import '../../domain/entities/settings_entities.dart';
 import '../bloc/settings_bloc.dart';
 import '../../../../widgets/app_toast.dart';
 import '../../../../widgets/field_limits.dart';
+import '../widgets/store_and_lan_settings.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -703,6 +704,8 @@ class _BusinessSection extends StatelessWidget {
           label: 'NTN / tax number',
           hintText: 'Optional for receipts',
         ),
+        const SizedBox(height: AppSpacing.xl),
+        const StoreTypeSettingsCard(),
       ],
     );
   }
@@ -1133,6 +1136,8 @@ class _DevicesSectionState extends State<_DevicesSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        const LanMultiDeviceSettingsCard(),
+        const SizedBox(height: AppSpacing.xl),
         SectionHeader(
           title: 'Devices',
           subtitle:

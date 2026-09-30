@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../../core/di/injection.dart';
+import '../../../../core/store_profile/store_profile_service.dart';
+import '../../../../core/store_profile/store_profiles.dart';
 import '../../../../modules/notifications/presentation/cubit/notifications_cubit.dart';
 import '../../../../modules/settings/domain/repositories/settings_repository.dart';
 import '../../../../themes/app_colors.dart';
@@ -63,6 +65,9 @@ class _ProductsView extends StatelessWidget {
       // Fall back to defaults if settings are unavailable.
     }
     if (!context.mounted) return;
+    final flags = await sl<StoreProfileService>().currentFlags();
+    final profileId = await sl<StoreProfileService>().currentProfileId();
+    if (!context.mounted) return;
     final draft = await showProductEditorSheet(
       context: context,
       categories: categories,
@@ -72,6 +77,9 @@ class _ProductsView extends StatelessWidget {
       taxEnabled: taxEnabled,
       defaultTaxRate: defaultTaxRate,
       defaultTaxInclusive: defaultTaxInclusive,
+      enableVariants: flags.enableProductVariants,
+      showStrength: profileId == StoreProfileId.pharmacy,
+      preferVolumeUnits: flags.preferVolumeUnits,
     );
     if (draft == null || !context.mounted) return;
     context.read<ProductsBloc>().add(

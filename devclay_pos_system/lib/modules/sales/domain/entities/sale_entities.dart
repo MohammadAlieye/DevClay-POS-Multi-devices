@@ -69,13 +69,13 @@ class SaleLineItem extends Equatable {
   factory SaleLineItem.fromJson(Map<String, dynamic> json) {
     final rawAllocations = json['batchAllocations'];
     return SaleLineItem(
-      productId: json['productId'] as int,
-      productName: json['productName'] as String,
-      productSku: json['productSku'] as String,
-      quantity: json['quantity'] as num,
-      unitPrice: (json['unitPrice'] as num).toDouble(),
+      productId: (json['productId'] as num?)?.toInt() ?? 0,
+      productName: '${json['productName'] ?? json['name'] ?? ''}',
+      productSku: '${json['productSku'] ?? json['sku'] ?? ''}',
+      quantity: (json['quantity'] as num?) ?? 0,
+      unitPrice: (json['unitPrice'] as num?)?.toDouble() ?? 0,
       lineDiscount: (json['lineDiscount'] as num?)?.toDouble() ?? 0,
-      lineTotal: (json['lineTotal'] as num).toDouble(),
+      lineTotal: (json['lineTotal'] as num?)?.toDouble() ?? 0,
       unit: json['unit'] as String?,
       quantityLabel: json['quantityLabel'] as String?,
       batchAllocations: rawAllocations is List

@@ -1590,13 +1590,13 @@ abstract final class SeedData {
           ..paperWidthMm = 80
           ..receiptContentWidthMm = 72
           ..receiptPrintAlign = 'center'
-          ..productUnitsCsv =
-              'pcs,kg,g,L,ml,m,half m,cm,mm,half,full,karahi,plate,dozen,pack,box'
-          ..productCategoriesCsv =
-              'Grocery,Beverages,Dairy,Snacks,Personal Care,Household,Electronics,Other'
+          ..productUnitsCsv = ''
+          ..productCategoriesCsv = ''
           ..themeMode = 'light'
           ..accentPreset = 'ocean'
-          ..primaryPreset = 'slate',
+          ..primaryPreset = 'slate'
+          ..storeProfile = ''
+          ..storeProfileConfigured = false,
       );
     });
   }

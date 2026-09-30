@@ -70,6 +70,9 @@ class PosProduct extends Equatable {
     this.expiryDate,
     this.imagePath,
     this.batches = const [],
+    this.hasVariants = false,
+    this.variants = const [],
+    this.selectedVariantId,
   });
 
   final int id;
@@ -94,6 +97,9 @@ class PosProduct extends Equatable {
   final DateTime? expiryDate;
   final String? imagePath;
   final List<PosBatchLot> batches;
+  final bool hasVariants;
+  final List<PosVariantOption> variants;
+  final int? selectedVariantId;
 
   /// True when [expiryDate] is before today's calendar date.
   bool get isExpired {
@@ -142,7 +148,36 @@ class PosProduct extends Equatable {
     expiryDate,
     imagePath,
     batches,
+    hasVariants,
+    variants,
+    selectedVariantId,
   ];
+}
+
+class PosVariantOption extends Equatable {
+  const PosVariantOption({
+    required this.id,
+    required this.size,
+    required this.color,
+    required this.stock,
+    this.barcode,
+    this.sku,
+    this.priceOverride = 0,
+  });
+
+  final int id;
+  final String size;
+  final String color;
+  final int stock;
+  final String? barcode;
+  final String? sku;
+  final double priceOverride;
+
+  String get label => '$size / $color';
+
+  @override
+  List<Object?> get props =>
+      [id, size, color, stock, barcode, sku, priceOverride];
 }
 
 /// Line-level discount input (% or fixed Rs).

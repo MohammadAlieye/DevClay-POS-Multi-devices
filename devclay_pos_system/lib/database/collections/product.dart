@@ -17,6 +17,12 @@ class Product {
   String? brand;
   String? manufacturer;
 
+  /// Pharmacy: strength / dosage text (e.g. 500mg).
+  String? strength;
+
+  /// When true, stock is tracked on [ProductVariant] rows.
+  bool hasVariants = false;
+
   /// Smallest stock/sale unit, e.g. Item, Packet, Bottle.
   String? unit;
 

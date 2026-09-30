@@ -10,10 +10,16 @@ import '../../../../database/collections/cash_shift.dart';
 import '../../../../database/collections/held_sale.dart';
 import '../../../../database/collections/ledger_entry.dart';
 import '../../../../database/collections/product.dart';
+import '../../../../database/collections/product_variant.dart';
 import '../../../../database/collections/recent_sale.dart';
 import '../../../../database/collections/sale.dart';
 import '../../../../database/collections/stock_movement.dart';
 import '../../../../core/auth/retail_actor.dart';
+import '../../../../core/di/injection.dart';
+import '../../../../core/lan_api/client/lan_api_client.dart';
+import '../../../../core/lan_api/client/lan_connection_monitor.dart';
+import '../../../../core/lan_api/dtos/lan_dtos.dart';
+import '../../../../core/lan_api/lan_mode_service.dart';
 import '../../../../database/isar_service.dart';
 import '../../../../database/product_batch_store.dart';
 import '../../../accounts/domain/entities/account_entities.dart';
@@ -26,6 +32,9 @@ class PosLocalDataSource {
   final IsarService _isarService;
 
   Future<List<PosProduct>> getProducts() async {
+    if (sl<LanModeService>().isClient) {
+      return _getProductsFromHost();
+    }
     final isar = _isarService.instance;
     final products = await isar.products
         .filter()
@@ -33,6 +42,14 @@ class PosLocalDataSource {
         .deletedAtIsNull()
         .sortByName()
         .findAll();
+    final allVariants = await isar.productVariants
+        .filter()
+        .deletedAtIsNull()
+        .findAll();
+    final variantsByProduct = <int, List<ProductVariant>>{};
+    for (final v in allVariants.where((v) => v.isActive)) {
+      variantsByProduct.putIfAbsent(v.productId, () => []).add(v);
+    }
     final taxEnabled = await _isTaxEnabled();
     final mapped = <PosProduct>[];
     for (final product in products) {
@@ -41,11 +58,16 @@ class PosLocalDataSource {
           .where((lot) => lot.expiryDate != null)
           .map((lot) => lot.expiryDate)
           .firstOrNull;
+      final variants = variantsByProduct[product.id] ?? const [];
+      final stock = product.hasVariants
+          ? variants.fold<int>(0, (sum, v) => sum + v.stock)
+          : product.stock;
       mapped.add(
         _mapProduct(
           product,
           taxEnabled: taxEnabled,
           expiryOverride: nearest ?? product.expiryDate,
+          stockOverride: stock,
           batches: lots
               .map(
                 (lot) => PosBatchLot(
@@ -58,10 +80,110 @@ class PosLocalDataSource {
                 ),
               )
               .toList(),
+          variants: variants
+              .map(
+                (v) => PosVariantOption(
+                  id: v.id,
+                  size: v.size,
+                  color: v.color,
+                  stock: v.stock,
+                  barcode: v.barcode,
+                  sku: v.sku,
+                  priceOverride: v.priceOverride,
+                ),
+              )
+              .toList(),
         ),
       );
     }
     return mapped;
+  }
+
+  Future<List<PosProduct>> _getProductsFromHost() async {
+    final online = await sl<LanConnectionMonitor>().refresh();
+    if (!online) {
+      throw StateError('Shop host offline — check Host PC and Wi‑Fi.');
+    }
+    final items = await sl<LanApiClient>().fetchProducts();
+    final taxEnabled = await _isTaxEnabled();
+    return [
+      for (final raw in items) _mapHostProduct(raw, taxEnabled: taxEnabled),
+    ];
+  }
+
+  PosProduct _mapHostProduct(
+    Map<String, dynamic> raw, {
+    required bool taxEnabled,
+  }) {
+    final variantsRaw = raw['variants'];
+    final batchesRaw = raw['batches'];
+    final variants = <PosVariantOption>[];
+    if (variantsRaw is List) {
+      for (final v in variantsRaw) {
+        if (v is! Map) continue;
+        final m = Map<String, dynamic>.from(v);
+        variants.add(
+          PosVariantOption(
+            id: (m['id'] as num?)?.toInt() ?? 0,
+            size: '${m['size'] ?? ''}',
+            color: '${m['color'] ?? ''}',
+            stock: (m['stock'] as num?)?.toInt() ?? 0,
+            barcode: m['barcode'] as String?,
+            sku: m['sku'] as String?,
+            priceOverride: (m['priceOverride'] as num?)?.toDouble() ?? 0,
+          ),
+        );
+      }
+    }
+    final batches = <PosBatchLot>[];
+    if (batchesRaw is List) {
+      for (final b in batchesRaw) {
+        if (b is! Map) continue;
+        final m = Map<String, dynamic>.from(b);
+        batches.add(
+          PosBatchLot(
+            id: (m['id'] as num?)?.toInt() ?? 0,
+            batchCode: m['batchCode'] as String?,
+            quantity: (m['quantity'] as num?)?.toInt() ?? 0,
+            receivedAt: DateTime.tryParse('${m['receivedAt']}') ?? DateTime.now(),
+            manufactureDate: DateTime.tryParse('${m['manufactureDate'] ?? ''}'),
+            expiryDate: DateTime.tryParse('${m['expiryDate'] ?? ''}'),
+          ),
+        );
+      }
+    }
+    final nearest = batches
+        .where((lot) => lot.expiryDate != null)
+        .map((lot) => lot.expiryDate)
+        .fold<DateTime?>(null, (best, d) {
+          if (d == null) return best;
+          if (best == null || d.isBefore(best)) return d;
+          return best;
+        });
+    return PosProduct(
+      id: (raw['id'] as num?)?.toInt() ?? 0,
+      sku: '${raw['sku'] ?? ''}',
+      barcode: '${raw['barcode'] ?? ''}',
+      name: '${raw['name'] ?? ''}',
+      category: '${raw['category'] ?? ''}',
+      brand: raw['brand'] as String?,
+      manufacturer: raw['manufacturer'] as String?,
+      unit: raw['unit'] as String?,
+      sellType: '${raw['sellType'] ?? 'piece'}',
+      itemsPerBox: (raw['itemsPerBox'] as num?)?.toInt() ?? 0,
+      sellingPrice: (raw['sellingPrice'] as num?)?.toDouble() ?? 0,
+      wholesalePrice: (raw['wholesalePrice'] as num?)?.toDouble() ?? 0,
+      purchasePrice: (raw['purchasePrice'] as num?)?.toDouble() ?? 0,
+      taxRate: taxEnabled ? ((raw['taxRate'] as num?)?.toDouble() ?? 0) : 0,
+      taxInclusive: taxEnabled ? raw['taxInclusive'] == true : false,
+      stock: (raw['stock'] as num?)?.toInt() ?? 0,
+      lowStockThreshold: (raw['lowStockThreshold'] as num?)?.toInt() ?? 0,
+      expiryDate: nearest ?? DateTime.tryParse('${raw['expiryDate'] ?? ''}'),
+      imagePath: raw['imagePath'] as String?,
+      batches: batches,
+      hasVariants: raw['hasVariants'] == true,
+      variants: variants,
+    );
   }
 
   Future<List<String>> getCategories() async {
@@ -71,6 +193,21 @@ class PosLocalDataSource {
   }
 
   Future<List<AccountItem>> getPaymentAccounts() async {
+    if (sl<LanModeService>().isClient) {
+      final items = await sl<LanApiClient>().fetchPaymentAccounts();
+      return [
+        for (final raw in items)
+          AccountItem(
+            id: (raw['id'] as num?)?.toInt() ?? 0,
+            name: '${raw['name'] ?? ''}',
+            type: '${raw['type'] ?? 'cash'}',
+            balance: (raw['balance'] as num?)?.toDouble() ?? 0,
+            isDefault: raw['isDefault'] == true,
+            isActive: raw['isActive'] != false,
+            notes: raw['notes'] as String?,
+          ),
+      ];
+    }
     final accounts = await _isarService.instance.accounts
         .filter()
         .isActiveEqualTo(true)
@@ -95,6 +232,18 @@ class PosLocalDataSource {
   }
 
   Future<List<PosCustomer>> getCustomers() async {
+    if (sl<LanModeService>().isClient) {
+      final items = await sl<LanApiClient>().fetchCustomers();
+      return [
+        for (final raw in items)
+          PosCustomer(
+            id: (raw['id'] as num?)?.toInt() ?? 0,
+            name: '${raw['name'] ?? ''}',
+            phone: '${raw['phone'] ?? ''}',
+            balance: (raw['balance'] as num?)?.toDouble() ?? 0,
+          ),
+      ];
+    }
     final customers = await _isarService.instance.customers
         .filter()
         .isActiveEqualTo(true)
@@ -113,6 +262,9 @@ class PosLocalDataSource {
   }
 
   Future<List<HeldSaleSummary>> getHeldSales() async {
+    if (sl<LanModeService>().isClient) {
+      return const [];
+    }
     final products = {for (final p in await getProducts()) p.id: p};
     final held = await _isarService.instance.heldSales
         .filter()
@@ -144,6 +296,9 @@ class PosLocalDataSource {
     int? customerId,
     String? notes,
   }) async {
+    if (sl<LanModeService>().isClient) {
+      throw StateError('Held sales are disabled on counter devices. Complete the sale on this till or cancel.');
+    }
     final isar = _isarService.instance;
     final code = 'H-${DateTime.now().millisecondsSinceEpoch % 100000}';
     final payload = lines
@@ -319,6 +474,23 @@ class PosLocalDataSource {
     int? cashAccountId,
     int? bankAccountId,
   }) async {
+    final lan = sl<LanModeService>();
+    if (lan.isClient) {
+      return _completeSaleOnHost(
+        lines: lines,
+        cartDiscount: cartDiscount,
+        cartDiscountMode: cartDiscountMode,
+        method: method,
+        amountPaid: amountPaid,
+        cardAmount: cardAmount,
+        customerName: customerName,
+        customerId: customerId,
+        notes: notes,
+        cashAccountId: cashAccountId,
+        bankAccountId: bankAccountId,
+      );
+    }
+
     final isar = _isarService.instance;
     final totals = _computeTotals(lines, cartDiscount, cartDiscountMode);
     final invoiceNo = 'INV-${DateTime.now().millisecondsSinceEpoch % 1000000}';
@@ -618,6 +790,89 @@ class PosLocalDataSource {
     );
   }
 
+  Future<CompletedSale> _completeSaleOnHost({
+    required List<CartLine> lines,
+    required double cartDiscount,
+    required CartDiscountMode cartDiscountMode,
+    required PaymentMethodKind method,
+    required double amountPaid,
+    required double cardAmount,
+    String? customerName,
+    int? customerId,
+    String? notes,
+    int? cashAccountId,
+    int? bankAccountId,
+  }) async {
+    final online = await sl<LanConnectionMonitor>().refresh();
+    if (!online) {
+      throw StateError('Shop host offline — check Host PC and Wi‑Fi.');
+    }
+    final totals = _computeTotals(lines, cartDiscount, cartDiscountMode);
+    final actor = await RetailActorStore.current(_isarService.instance);
+    final methodLabel = switch (method) {
+      PaymentMethodKind.cash => 'Cash',
+      PaymentMethodKind.card => 'Card / Bank',
+      PaymentMethodKind.split => 'Split',
+      PaymentMethodKind.khata => 'Khata / Udhar',
+    };
+    final methodKind = switch (method) {
+      PaymentMethodKind.cash => 'cash',
+      PaymentMethodKind.card => 'card',
+      PaymentMethodKind.split => 'split',
+      PaymentMethodKind.khata => 'khata',
+    };
+    final paid = method == PaymentMethodKind.card
+        ? totals.total
+        : method == PaymentMethodKind.split
+            ? amountPaid + cardAmount
+            : amountPaid;
+    final change = (paid - totals.total).clamp(0, double.infinity).toDouble();
+    final linesJson = jsonEncode([
+      for (final line in lines)
+        {
+          'productId': line.product.id,
+          'variantId': line.product.selectedVariantId,
+          'name': line.product.name,
+          'quantity': line.quantity,
+          'unitPrice': line.unitPrice,
+          'lineTotal': line.lineTotal,
+        },
+    ]);
+    final result = await sl<LanApiClient>().createSale(
+      LanCreateSaleDto(
+        linesJson: linesJson,
+        cashierId: actor?.id ?? 0,
+        cashierName: actor?.name ?? 'Cashier',
+        subtotal: totals.subtotal,
+        tax: totals.tax,
+        total: totals.total,
+        discount: totals.discount,
+        paymentMethod: methodLabel,
+        amountPaid: amountPaid,
+        cardAmount: cardAmount,
+        changeAmount: change,
+        itemCount: lines.fold<int>(0, (sum, l) => sum + l.quantity),
+        customerId: customerId,
+        customerName: customerName,
+        notes: notes,
+        cashAccountId: cashAccountId,
+        bankAccountId: bankAccountId,
+        methodKind: methodKind,
+      ),
+    );
+    return CompletedSale(
+      invoiceNo: '${result['invoiceNo']}',
+      lines: List.unmodifiable(lines),
+      totals: totals,
+      paymentMethod: methodLabel,
+      amountPaid: paid,
+      change: change,
+      customerName: customerName,
+      notes: notes,
+      completedAt: DateTime.tryParse('${result['soldAt']}') ?? DateTime.now(),
+    );
+  }
+
   Future<void> _depositSale({
     required Isar isar,
     required Account account,
@@ -685,7 +940,9 @@ class PosLocalDataSource {
     Product product, {
     required bool taxEnabled,
     DateTime? expiryOverride,
+    int? stockOverride,
     List<PosBatchLot> batches = const [],
+    List<PosVariantOption> variants = const [],
   }) {
     return PosProduct(
       id: product.id,
@@ -703,11 +960,13 @@ class PosLocalDataSource {
       purchasePrice: product.purchasePrice,
       taxRate: taxEnabled ? product.taxRate : 0,
       taxInclusive: taxEnabled ? product.taxInclusive : false,
-      stock: product.stock,
+      stock: stockOverride ?? product.stock,
       lowStockThreshold: product.lowStockThreshold,
       expiryDate: expiryOverride ?? product.expiryDate,
       imagePath: product.imagePath,
       batches: batches,
+      hasVariants: product.hasVariants,
+      variants: variants,
     );
   }
 

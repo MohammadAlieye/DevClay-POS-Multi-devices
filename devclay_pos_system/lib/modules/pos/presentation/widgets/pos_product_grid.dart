@@ -340,7 +340,44 @@ class _ProductTile extends StatelessWidget {
   final int cartQty;
   final PosProductLayout layout;
 
-  void _addProduct(BuildContext context) {
+  void _addProduct(BuildContext context) async {
+    var product = this.product;
+    if (product.hasVariants && product.variants.isNotEmpty) {
+      final picked = await showDialog<PosVariantOption>(
+        context: context,
+        builder: (context) => _VariantPickDialog(product: product),
+      );
+      if (picked == null || !context.mounted) return;
+      product = PosProduct(
+        id: product.id,
+        sku: picked.sku?.isNotEmpty == true ? picked.sku! : product.sku,
+        barcode:
+            picked.barcode?.isNotEmpty == true ? picked.barcode! : product.barcode,
+        name: '${product.name} (${picked.label})',
+        category: product.category,
+        brand: product.brand,
+        manufacturer: product.manufacturer,
+        unit: product.unit,
+        sellType: product.sellType,
+        itemsPerBox: product.itemsPerBox,
+        sellingPrice: picked.priceOverride > 0
+            ? picked.priceOverride
+            : product.sellingPrice,
+        wholesalePrice: product.wholesalePrice,
+        purchasePrice: product.purchasePrice,
+        taxRate: product.taxRate,
+        taxInclusive: product.taxInclusive,
+        stock: picked.stock,
+        lowStockThreshold: product.lowStockThreshold,
+        expiryDate: product.expiryDate,
+        imagePath: product.imagePath,
+        batches: product.batches,
+        hasVariants: true,
+        variants: product.variants,
+        selectedVariantId: picked.id,
+      );
+    }
+    if (!context.mounted) return;
     context.read<PosBloc>().add(PosProductAdded(product));
   }
 
@@ -547,6 +584,79 @@ class _ProductTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _VariantPickDialog extends StatefulWidget {
+  const _VariantPickDialog({required this.product});
+
+  final PosProduct product;
+
+  @override
+  State<_VariantPickDialog> createState() => _VariantPickDialogState();
+}
+
+class _VariantPickDialogState extends State<_VariantPickDialog> {
+  String? _size;
+
+  @override
+  Widget build(BuildContext context) {
+    final variants = widget.product.variants;
+    final sizes = variants.map((v) => v.size).toSet().toList()..sort();
+    final colors = variants
+        .where((v) => _size == null || v.size == _size)
+        .map((v) => v.color)
+        .toSet()
+        .toList()
+      ..sort();
+
+    return AlertDialog(
+      title: Text('Size & color — ${widget.product.name}'),
+      content: SizedBox(
+        width: 400,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final size in sizes)
+                  ChoiceChip(
+                    label: Text(size),
+                    selected: _size == size,
+                    onSelected: (_) => setState(() => _size = size),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final color in colors)
+                  ActionChip(
+                    label: Text(color),
+                    onPressed: _size == null
+                        ? null
+                        : () {
+                            final match = variants.firstWhere(
+                              (v) => v.size == _size && v.color == color,
+                            );
+                            Navigator.pop(context, match);
+                          },
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+      ],
     );
   }
 }

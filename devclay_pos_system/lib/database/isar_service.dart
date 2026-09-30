@@ -16,6 +16,7 @@ import 'collections/held_sale.dart';
 import 'collections/low_stock_item.dart';
 import 'collections/product.dart';
 import 'collections/product_batch.dart';
+import 'collections/product_variant.dart';
 import 'collections/recent_sale.dart';
 import 'collections/sale.dart';
 import 'collections/sales_point.dart';
@@ -47,7 +48,7 @@ class IsarService {
 
   // Bump only when a collection schema changes. Before opening a database
   // from an older revision, a one-time safety copy is created beside it.
-  static const schemaRevision = '2026-08-24-product-categories-v1';
+  static const schemaRevision = '2026-09-30-store-profile-variants-v1';
 
   static const List<CollectionSchema> schemas = [
     DashboardMetricSchema,
@@ -60,6 +61,7 @@ class IsarService {
     UserAccountSchema,
     AuthSessionSchema,
     ProductSchema,
+    ProductVariantSchema,
     ProductBatchSchema,
     HeldSaleSchema,
     StockMovementSchema,
